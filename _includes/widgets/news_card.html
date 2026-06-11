@@ -1,0 +1,51 @@
+{% assign sorted_news = site.news | sort: "date" | reverse %}
+{% assign visible_news = sorted_news | slice: 0, 3 %}
+{% assign total_news = sorted_news | size %}
+{% assign hidden_news_size = total_news | minus: 3 %}
+{% assign hidden_news = sorted_news | slice: 3, hidden_news_size %}
+
+<div class="my-3 bg-white shadow-sm rounded-xl">
+    <h6 class="p-3 mb-0 border-bottom border-gray"><i class="fas fa-rss"></i> News</h6>
+    <div class="px-3 pb-1 small">
+        <ul class="news-list pt-2">
+            {% for item in visible_news %}
+            <li class="news-item">
+                <span class="news-date">{{ item.date | date: "%b. %Y" }}</span>
+                <span class="news-text">
+                    {{ item.title }}
+                    {% if item.certificate %}
+                    <a class="cert-badge" {% if item.certificate_type == "pdf" %}href="{{ item.certificate | relative_url }}" target="_blank" rel="noopener noreferrer"{% else %}data-cert="{{ item.certificate | relative_url }}" href="{{ item.certificate | relative_url }}"{% endif %}>
+                        <i class="fas fa-award fa-xs"></i>&nbsp;Cert.
+                    </a>
+                    {% endif %}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% if hidden_news_size > 0 %}
+        <div class="collapse" id="older-news">
+            <ul class="news-list pt-0">
+                {% for item in hidden_news %}
+                <li class="news-item">
+                    <span class="news-date">{{ item.date | date: "%b. %Y" }}</span>
+                    <span class="news-text">
+                        {{ item.title }}
+                        {% if item.certificate %}
+                        <a class="cert-badge" {% if item.certificate_type == "pdf" %}href="{{ item.certificate | relative_url }}" target="_blank" rel="noopener noreferrer"{% else %}data-cert="{{ item.certificate | relative_url }}" href="{{ item.certificate | relative_url }}"{% endif %}>
+                            <i class="fas fa-award fa-xs"></i>&nbsp;Cert.
+                        </a>
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="#older-news" data-toggle="collapse" class="news-toggle-btn d-block text-center mt-2 pb-3" aria-expanded="false" aria-controls="older-news" style="font-size: 0.8rem; color: #0066cc; text-decoration: none; font-family: 'Raleway', sans-serif;">
+            <span class="show-more">View older news...</span>
+            <span class="show-less">Show less</span>
+        </a>
+        {% endif %}
+    </div>
+</div>

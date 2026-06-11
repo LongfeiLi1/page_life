@@ -1,0 +1,37 @@
+primary_name: "Longfei Li"
+secondary_name: ""
+navbar_name: "Longfei Li"
+
+positions:
+- name: Master's Student in Electronic Information
+- name: Hunan University
+
+email: "kurobalt26@gmail.com"
+github: LongfeiLi1
+orcid: 0009-0003-6447-8345
+
+short_bio_text_justify: false
+short_bio: >-
+  <p>
+      I am a Master's student in Electronic Information at <a href="https://www.hnu.edu.cn/" target="_blank">Hunan University</a>.
+      My research lies at the intersection of <strong>Vision Language Models (VLMs)</strong>
+      and <strong>Electronic Design Automation (EDA)</strong>.
+  </p>
+  <p>
+      I received my B.Sc. in Computer Science from <a href="https://www.sylu.edu.cn/" target="_blank">Shenyang Ligong University</a>,
+      where I competed in ICPC/CCPC and earned multiple national and regional awards.
+      Outside of research, I enjoy landscape and street photography, and cycling.
+  </p>
+
+portrait_url: /assets/profile.jpeg
+portrait_caption: ""
+
+education:
+- name: Hunan University
+  dept: M.Eng. in Electronic Information
+  date: Sep. 2025 – Present
+  logo: /assets/images/badges/hnu-logo.svg
+- name: Shenyang Ligong University
+  dept: B.Sc. in Computer Science
+  date: Sep. 2021 – Jul. 2025
+  logo: /assets/images/badges/sylu-logo.svg
