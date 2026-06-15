@@ -32,7 +32,17 @@ let showSemanticScholarCitationCount = () => {
             const { citationCount } = JSON.parse(cachedData);
             const elements = document.querySelectorAll(`[data-semantic-scholar-id="${id}"]`);
             elements.forEach(element => {
-                element.innerHTML = `<a class="badge badge-pill badge-publication badge-info" href="https://www.semanticscholar.org/paper/${id}" target="_blank"><i class="ai ai-semantic-scholar"></i> ${parseInt(citationCount).toLocaleString()} citations</a>`;
+                var a = document.createElement('a');
+                a.className = 'badge badge-pill badge-publication badge-info';
+                a.href = 'https://www.semanticscholar.org/paper/' + encodeURIComponent(id);
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                var icon = document.createElement('i');
+                icon.className = 'ai ai-semantic-scholar';
+                a.appendChild(icon);
+                a.appendChild(document.createTextNode(' ' + parseInt(citationCount).toLocaleString() + ' citations'));
+                element.textContent = '';
+                element.appendChild(a);
             });
         }
     });
@@ -51,7 +61,7 @@ if (uncachedSemanticScholarIds.length > 0) {
         return response.json();
     }).then(data => {
         data.forEach(paper => {
-            console.log(paper);
+
             // Cache citation count data
             const cacheKey = `semanticScholarCitationCount:${paper.paperId}`;
             const cacheData = {
