@@ -9,17 +9,7 @@
     <div class="px-3 pb-1 small">
         <ul class="news-list pt-2">
             {% for item in visible_news %}
-            <li class="news-item">
-                <span class="news-date">{{ item.date | date: "%b. %Y" }}</span>
-                <span class="news-text">
-                    {{ item.title }}
-                    {% if item.certificate %}
-                    <a class="cert-badge" {% if item.certificate_type == "pdf" %}href="{{ item.certificate | relative_url }}" target="_blank" rel="noopener noreferrer"{% else %}data-cert="{{ item.certificate | relative_url }}" href="{{ item.certificate | relative_url }}"{% endif %}>
-                        <i class="fas fa-award fa-xs"></i>&nbsp;Cert.
-                    </a>
-                    {% endif %}
-                </span>
-            </li>
+            {% include widgets/news_item.html item=item %}
             {% endfor %}
         </ul>
 
@@ -27,17 +17,7 @@
         <div class="collapse" id="older-news">
             <ul class="news-list pt-0">
                 {% for item in hidden_news %}
-                <li class="news-item">
-                    <span class="news-date">{{ item.date | date: "%b. %Y" }}</span>
-                    <span class="news-text">
-                        {{ item.title }}
-                        {% if item.certificate %}
-                        <a class="cert-badge" {% if item.certificate_type == "pdf" %}href="{{ item.certificate | relative_url }}" target="_blank" rel="noopener noreferrer"{% else %}data-cert="{{ item.certificate | relative_url }}" href="{{ item.certificate | relative_url }}"{% endif %}>
-                            <i class="fas fa-award fa-xs"></i>&nbsp;Cert.
-                        </a>
-                        {% endif %}
-                    </span>
-                </li>
+                {% include widgets/news_item.html item=item %}
                 {% endfor %}
             </ul>
         </div>

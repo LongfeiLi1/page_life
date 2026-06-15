@@ -1,0 +1,49 @@
+{%- assign link_class = include.class | default: "pr-3 no-break" -%}
+{%- assign show_text = include.show_text | default: true -%}
+
+{% if site.data.profile.gscholar %}
+{%- if site.data.profile.gscholar contains 'scholar.google' -%}
+{%- assign gscholar_url = site.data.profile.gscholar -%}
+{%- else -%}
+{%- assign gscholar_url = 'https://scholar.google.com/citations?user=' | append: site.data.profile.gscholar -%}
+{%- endif -%}
+<a class="{{ link_class }}" target="_blank" href="{{ gscholar_url }}">
+    <i class="fab fa-google-scholar"></i>{% if show_text %} Google Scholar{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.github %}
+<a class="{{ link_class }}" target="_blank" href="https://github.com/{{ site.data.profile.github }}">
+    <i class="fab fa-github"></i>{% if show_text %} GitHub{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.wechat_qrcode %}
+<a class="{{ link_class }}" data-toggle="modal" data-target="#modal-wechat">
+    <i class="fab fa-weixin"></i>{% if show_text %} WeChat{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.twitter %}
+<a class="{{ link_class }}" target="_blank" href="https://twitter.com/{{ site.data.profile.twitter }}">
+    <i class="fab fa-twitter"></i>{% if show_text %} Twitter{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.linkedin %}
+<a class="{{ link_class }}" target="_blank" href="https://www.linkedin.com/in/{{ site.data.profile.linkedin }}">
+    <i class="fab fa-linkedin"></i>{% if show_text %} LinkedIn{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.orcid %}
+<a class="{{ link_class }}" target="_blank" href="https://orcid.org/{{ site.data.profile.orcid }}">
+    <i class="fab fa-orcid"></i>{% if show_text %} ORCID{% endif %}
+</a>
+{% endif %}
+
+{% if site.data.profile.cv %}
+<a class="{{ link_class }}" target="_blank" href="{{ site.data.profile.cv }}">
+    <i class="fas fa-file-pdf"></i>{% if show_text %} CV{% endif %}
+</a>
+{% endif %}
