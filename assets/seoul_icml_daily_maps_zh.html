@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>首尔 ICML 每日分段路线地图</title>
+  <style>
+    :root {
+      --bg: #f4f2ed;
+      --paper: #fffdf8;
+      --ink: #1f282d;
+      --muted: #647176;
+      --line: #d8d0c4;
+      --accent: #0b6b6f;
+      --soft: #e9f3f1;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Malgun Gothic", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #fffaf0;
+      border-bottom: 1px solid var(--line);
+      padding: 16px clamp(12px, 4vw, 38px);
+    }
+    .head {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 14px;
+      align-items: end;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(25px, 4vw, 40px);
+      color: #17383b;
+      line-height: 1.15;
+    }
+    header p, .card-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .actions, nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .btn, nav a, .open-img {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      text-decoration: none;
+      min-height: 38px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    nav {
+      max-width: 1380px;
+      margin: 10px auto 0;
+      justify-content: flex-start;
+    }
+    nav a {
+      background: var(--soft);
+      border-color: #bdd8d5;
+      min-height: 32px;
+      padding: 6px 10px;
+    }
+    main {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 22px clamp(10px, 2vw, 24px) 42px;
+    }
+    .day {
+      scroll-margin-top: 138px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      margin: 20px 0 12px;
+      font-size: 30px;
+      color: #17383b;
+    }
+    .map-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(12px, 2vw, 20px);
+      margin: 0 0 18px;
+      box-shadow: 0 16px 38px rgba(46, 37, 24, 0.11);
+    }
+    .card-head {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    h3 {
+      margin: 0 0 7px;
+      font-size: clamp(20px, 2.5vw, 27px);
+      color: #17383b;
+      line-height: 1.2;
+    }
+    img {
+      display: block;
+      width: 100%;
+      border: 1px solid #cbd8d5;
+      border-radius: 8px;
+      background: #e8efed;
+    }
+    .below {
+      display: grid;
+      grid-template-columns: minmax(0,1.1fr) minmax(260px,.9fr);
+      gap: 18px;
+      margin-top: 14px;
+    }
+    h4 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: #17383b;
+    }
+    ol {
+      margin: 0 0 12px;
+      padding-left: 22px;
+      display: grid;
+      gap: 6px;
+      line-height: 1.55;
+    }
+    .station-line {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      background: #fff;
+    }
+    .station-line b {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chips span {
+      border: 1px solid #d7d2c8;
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: #fbfaf5;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+    .chips small {
+      margin-left: 5px;
+      color: var(--muted);
+    }
+    .quick {
+      display: grid;
+      gap: 8px;
+    }
+    .quick a {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+    }
+    .quick small {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .note {
+      max-width: 1380px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    @media (max-width: 860px) {
+      header { position: static; }
+      .head, .card-head, .below { grid-template-columns: 1fr; }
+      .actions { justify-content: flex-start; }
+      .day { scroll-margin-top: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="head">
+      <div>
+        <h1>首尔 ICML 每日分段路线地图</h1>
+        <p>现在按“长距离交通”和“落地步行”拆图：步行是真实道路路线，地铁按一站一站标记，巴士只标上下车点，南山用步行+缆车混合图。</p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="seoul_icml_flipbook_zh.html">返回翻页行程</a>
+        <button class="btn primary" onclick="window.print()">打印 / PDF</button>
+      </div>
+    </div>
+    <nav><a href='#d7/4'>7/4</a><a href='#d7/5'>7/5</a><a href='#d7/6'>7/6</a><a href='#d7/7'>7/7</a><a href='#d7/8'>7/8</a><a href='#d7/9'>7/9</a><a href='#d7/10'>7/10</a><a href='#d7/11'>7/11</a><a href='#d7/12'>7/12</a></nav>
+    <p class="note">线条和编号已经缩小。步行路线由 OSRM foot routing 生成；南山缆车线只表示上山交通关系，不是步行路。出门最终仍以 Naver Map 当天路线、出口和施工绕行为准。</p>
+  </header>
+  <main>
+            <section class="day" id="d7/4">
+              <h2>7/4</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/4-1 机场巴士：仁川机场 -&gt; COEX City Airport Terminal</h3>
+                      <p>落地先确认航站楼；T1 去 1F 7A-3，T2 去 B1 21号站台。地图只标上下车点，巴士中途道路不展开。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0704_01_bus.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0704_01_bus.png" alt="机场巴士：仁川机场 -&gt; COEX City Airport Terminal">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>6103 / 6103번，方向 COEX / 코엑스。</li><li>下车点：COEX City Airport Terminal / 도심공항터미널。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/Incheon%20Airport%20Terminal%202' target='_blank' rel='noopener'>仁川机场 T2<small>인천공항 제2터미널</small></a><a href='https://map.naver.com/p/search/Incheon%20Airport%20Terminal%201' target='_blank' rel='noopener'>仁川机场 T1<small>인천공항 제1터미널</small></a><a href='https://map.naver.com/p/search/COEX%20City%20Airport%20Terminal%20Seoul' target='_blank' rel='noopener'>COEX City Airport Terminal<small>도심공항터미널</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/4-2 步行放大：CALT -&gt; 酒店 -&gt; COEX / 奉恩寺</h3>
+                      <p>到 COEX 后全程步行，不打车。先去酒店放行李，晚上只在 COEX 周边走。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0704_02_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0704_02_walk.png" alt="步行放大：CALT -&gt; 酒店 -&gt; COEX / 奉恩寺">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>CALT 下车后开 Naver Map 搜 GOYOO INN &amp; CABINS。</li><li>晚上 COEX Mall、星空图书馆、奉恩寺外部都在步行范围内。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/COEX%20City%20Airport%20Terminal%20Seoul' target='_blank' rel='noopener'>COEX City Airport Terminal<small>도심공항터미널</small></a><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a><a href='https://map.naver.com/p/search/%EB%B4%89%EC%9D%80%EC%82%AC' target='_blank' rel='noopener'>奉恩寺<small>봉은사</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/5">
+              <h2>7/5</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-1 地铁去景福宫：宣陵 -&gt; 乙支路3街换乘 -&gt; 景福宫</h3>
+                      <p>2号线坐到乙支路3街，换 3号线到景福宫。图上每个小圆点是一站，完整站名在下方。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_01_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_01_subway.png" alt="地铁去景福宫：宣陵 -&gt; 乙支路3街换乘 -&gt; 景福宫">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站上 2号线，看 Samseong / 삼성、Jamsil / 잠실、Wangsimni / 왕십리 方向。</li><li>乙支路3街换 3号线，看 Daehwa / 대화 或 Gupabal / 구파발 方向。</li><li>景福宫站走 5号出口 Exit 5。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>三成站<small>삼성역</small></span><span>综合运动场站<small>종합운동장역</small></span><span>蚕室新川站<small>잠실새내역</small></span><span>蚕室站<small>잠실역</small></span><span>蚕室渡口站<small>잠실나루역</small></span><span>江边站<small>강변역</small></span><span>九宜站<small>구의역</small></span><span>建大入口站<small>건대입구역</small></span><span>圣水站<small>성수역</small></span><span>纛岛站<small>뚝섬역</small></span><span>汉阳大站<small>한양대역</small></span><span>往十里站<small>왕십리역</small></span><span>上往十里站<small>상왕십리역</small></span><span>新堂站<small>신당역</small></span><span>东大门历史文化公园站<small>동대문역사문화공원역</small></span><span>乙支路4街站<small>을지로4가역</small></span><span>乙支路3街站<small>을지로3가역</small></span></div></div><div class='station-line'><b>3号线 / 3호선</b><div class='chips'><span>乙支路3街站<small>을지로3가역</small></span><span>钟路3街站<small>종로3가역</small></span><span>安国站<small>안국역</small></span><span>景福宫站 Exit 5<small>경복궁역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%EC%9D%84%EC%A7%80%EB%A1%9C3%EA%B0%80%EC%97%AD' target='_blank' rel='noopener'>乙支路3街站<small>을지로3가역</small></a><a href='https://map.naver.com/p/search/%EA%B2%BD%EB%B3%B5%EA%B6%81%EC%97%AD' target='_blank' rel='noopener'>景福宫站 Exit 5<small>경복궁역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-2 步行放大：景福宫站 -&gt; 景福宫 -&gt; 土俗村 -&gt; 北村 -&gt; 仁寺洞</h3>
+                      <p>这一段是实际步行路线，适合照着 Naver Map 分段走。北村是居民区，拍照轻声。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_02_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_02_walk.png" alt="步行放大：景福宫站 -&gt; 景福宫 -&gt; 土俗村 -&gt; 北村 -&gt; 仁寺洞">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>景福宫站 Exit 5 出来先去景福宫。</li><li>午饭土俗村；排队太久就直接换附近汤饭。</li><li>下午从北村走到仁寺洞 / Ssamziegil。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EA%B2%BD%EB%B3%B5%EA%B6%81%EC%97%AD' target='_blank' rel='noopener'>景福宫站 Exit 5<small>경복궁역</small></a><a href='https://map.naver.com/p/search/%EA%B2%BD%EB%B3%B5%EA%B6%81' target='_blank' rel='noopener'>景福宫<small>경복궁</small></a><a href='https://map.naver.com/p/search/%ED%86%A0%EC%86%8D%EC%B4%8C%20%EC%82%BC%EA%B3%84%ED%83%95' target='_blank' rel='noopener'>土俗村参鸡汤<small>토속촌 삼계탕</small></a><a href='https://map.naver.com/p/search/%EB%B6%81%EC%B4%8C%ED%95%9C%EC%98%A5%EB%A7%88%EC%9D%84' target='_blank' rel='noopener'>北村韩屋村<small>북촌한옥마을</small></a><a href='https://map.naver.com/p/search/%EC%8C%88%EC%A7%80%EA%B8%B8%20%EC%9D%B8%EC%82%AC%EB%8F%99' target='_blank' rel='noopener'>仁寺洞 / Ssamziegil<small>인사동 쌈지길</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-3 地铁去明洞：安国 -&gt; 忠武路换乘 -&gt; 明洞</h3>
+                      <p>逛完仁寺洞后从安国站上车，3号线到忠武路，换 4号线一站到明洞。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_03_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_03_subway.png" alt="地铁去明洞：安国 -&gt; 忠武路换乘 -&gt; 明洞">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>安国站上 3号线，方向 Ogeum / 오금。</li><li>忠武路换 4号线，1站到明洞站。</li><li>明洞站常用 Exit 6；最终出口看 Naver Map。</li></ol>
+                      <div class='station-line'><b>3号线 / 3호선</b><div class='chips'><span>安国站<small>안국역</small></span><span>钟路3街站<small>종로3가역</small></span><span>乙支路3街站<small>을지로3가역</small></span><span>忠武路站<small>충무로역</small></span></div></div><div class='station-line'><b>4号线 / 4호선</b><div class='chips'><span>忠武路站<small>충무로역</small></span><span>明洞站<small>명동역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%95%88%EA%B5%AD%EC%97%AD' target='_blank' rel='noopener'>安国站<small>안국역</small></a><a href='https://map.naver.com/p/search/%EC%B6%A9%EB%AC%B4%EB%A1%9C%EC%97%AD' target='_blank' rel='noopener'>忠武路站<small>충무로역</small></a><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EC%97%AD' target='_blank' rel='noopener'>明洞站<small>명동역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-4 步行放大：明洞站 -&gt; 明洞饺子 -&gt; Olive Young</h3>
+                      <p>明洞内部只走路，买东西记得护照退税。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_04_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_04_walk.png" alt="步行放大：明洞站 -&gt; 明洞饺子 -&gt; Olive Young">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>先吃明洞饺子，再去 Olive Young 主店/大店。</li><li>液体别买太夸张，回国行李还要看重量和托运。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EC%97%AD' target='_blank' rel='noopener'>明洞站<small>명동역</small></a><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EA%B5%90%EC%9E%90%20%EB%B3%B8%EC%A0%90' target='_blank' rel='noopener'>明洞饺子<small>명동교자</small></a><a href='https://map.naver.com/p/search/Olive%20Young%20Myeongdong%20Town' target='_blank' rel='noopener'>Olive Young 明洞<small>올리브영 명동</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-5 可选夜景：明洞 -&gt; 南山缆车 -&gt; N 首尔塔</h3>
+                      <p>天气好、体力够才去。先从明洞步行到南山缆车下站，再坐缆车上 N 首尔塔；回程原路回明洞站。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_05_namsan.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_05_namsan.png" alt="可选夜景：明洞 -&gt; 南山缆车 -&gt; N 首尔塔">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>明洞站 Myeongdong / 명동역 出来，用 Naver Map 搜 남산 케이블카。</li><li>到南山缆车下站后买往返票上山；人太多或下雨就跳过。</li><li>N 首尔塔只看夜景也可以，不一定买观景台票。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EC%97%AD' target='_blank' rel='noopener'>明洞站<small>명동역</small></a><a href='https://map.naver.com/p/search/%EB%82%A8%EC%82%B0%20%EC%BC%80%EC%9D%B4%EB%B8%94%EC%B9%B4' target='_blank' rel='noopener'>南山缆车下站<small>남산 케이블카</small></a><a href='https://map.naver.com/p/search/N%EC%84%9C%EC%9A%B8%ED%83%80%EC%9B%8C' target='_blank' rel='noopener'>N 首尔塔<small>N서울타워</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/5-6 地铁回酒店：明洞 -&gt; 舍堂换乘 -&gt; 宣陵</h3>
+                      <p>4号线到舍堂，换 2号线回宣陵。站点比较多，下方站点条按顺序核对。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0705_06_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0705_06_subway.png" alt="地铁回酒店：明洞 -&gt; 舍堂换乘 -&gt; 宣陵">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>明洞站坐 4号线，看 Sadang / 사당、Oido / 오이도 方向。</li><li>舍堂站换 2号线，看 Gangnam / 강남、Seolleung / 선릉 方向。</li></ol>
+                      <div class='station-line'><b>4号线 / 4호선</b><div class='chips'><span>明洞站<small>명동역</small></span><span>会贤站<small>회현역</small></span><span>首尔站<small>서울역</small></span><span>淑大入口站<small>숙대입구역</small></span><span>三角地站<small>삼각지역</small></span><span>新龙山站<small>신용산역</small></span><span>二村站<small>이촌역</small></span><span>铜雀站<small>동작역</small></span><span>总神大入口/梨水站<small>총신대입구(이수)역</small></span><span>舍堂站<small>사당역</small></span></div></div><div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>舍堂站<small>사당역</small></span><span>方背站<small>방배역</small></span><span>瑞草站<small>서초역</small></span><span>教大站<small>교대역</small></span><span>江南站<small>강남역</small></span><span>驿三站<small>역삼역</small></span><span>宣陵站<small>선릉역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EC%97%AD' target='_blank' rel='noopener'>明洞站<small>명동역</small></a><a href='https://map.naver.com/p/search/%EC%82%AC%EB%8B%B9%EC%97%AD' target='_blank' rel='noopener'>舍堂站<small>사당역</small></a><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/6">
+              <h2>7/6</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/6-1 步行放大：酒店 -&gt; COEX / ICML 注册</h3>
+                      <p>酒店到 COEX 走路。早上别尝试复杂换乘，直接按 Naver Map 走到 COEX Convention Center。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0706_01_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0706_01_walk.png" alt="步行放大：酒店 -&gt; COEX / ICML 注册">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>目标搜 COEX Convention Center / 코엑스 컨벤션센터。</li><li>到会场后找 ICML registration / badge。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/6-2 地铁去蚕室：三成 -&gt; 蚕室</h3>
+                      <p>从 COEX 附近三成站坐 2号线，3站到蚕室。每站都标出来。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0706_02_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0706_02_subway.png" alt="地铁去蚕室：三成 -&gt; 蚕室">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>三成站上 2号线，看 Jamsil / 잠실 方向。</li><li>蚕室站下车，跟 Lotte World Mall / 롯데월드몰 指示走。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>三成站<small>삼성역</small></span><span>综合运动场站<small>종합운동장역</small></span><span>蚕室新川站<small>잠실새내역</small></span><span>蚕室站<small>잠실역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%82%BC%EC%84%B1%EC%97%AD' target='_blank' rel='noopener'>三成站<small>삼성역</small></a><a href='https://map.naver.com/p/search/%EC%9E%A0%EC%8B%A4%EC%97%AD' target='_blank' rel='noopener'>蚕室站<small>잠실역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/6-3 步行放大：蚕室站 -&gt; 乐天世界塔</h3>
+                      <p>蚕室站和 Lotte World Mall 连接很好，现场按商场指示走即可。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0706_03_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0706_03_walk.png" alt="步行放大：蚕室站 -&gt; 乐天世界塔">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>蚕室站看 Lotte World Mall / 롯데월드몰 指示。</li><li>回程原路回蚕室站坐 2号线。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%9E%A0%EC%8B%A4%EC%97%AD' target='_blank' rel='noopener'>蚕室站<small>잠실역</small></a><a href='https://map.naver.com/p/search/%EB%A1%AF%EB%8D%B0%EC%9B%94%EB%93%9C%ED%83%80%EC%9B%8C' target='_blank' rel='noopener'>乐天世界塔<small>롯데월드타워</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/7">
+              <h2>7/7</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/7-1 步行放大：酒店 &lt;-&gt; COEX</h3>
+                      <p>上午会议，酒店和 COEX 之间走路。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0707_01_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0707_01_walk.png" alt="步行放大：酒店 &lt;-&gt; COEX">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>带 badge、自带雨伞、水。</li><li>下午回酒店放会议资料后再去圣水。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/7-2 地铁去圣水：宣陵 -&gt; 圣水</h3>
+                      <p>2号线一条线到圣水。图上每个点是一站。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0707_02_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0707_02_subway.png" alt="地铁去圣水：宣陵 -&gt; 圣水">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站上 2号线，看 Jamsil / 잠실、Wangsimni / 왕십리、Seongsu / 성수 方向。</li><li>圣水站去 Cafe Onion 优先走 Exit 2。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>三成站<small>삼성역</small></span><span>综合运动场站<small>종합운동장역</small></span><span>蚕室新川站<small>잠실새내역</small></span><span>蚕室站<small>잠실역</small></span><span>蚕室渡口站<small>잠실나루역</small></span><span>江边站<small>강변역</small></span><span>九宜站<small>구의역</small></span><span>建大入口站<small>건대입구역</small></span><span>圣水站<small>성수역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%EC%84%B1%EC%88%98%EC%97%AD' target='_blank' rel='noopener'>圣水站<small>성수역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/7-3 步行放大：圣水站 -&gt; Cafe Onion -&gt; 圣水土豆汤</h3>
+                      <p>圣水洞内部走路。咖啡店排队太长就换周边店，不影响路线。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0707_03_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0707_03_walk.png" alt="步行放大：圣水站 -&gt; Cafe Onion -&gt; 圣水土豆汤">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>圣水站 Exit 2 出来。</li><li>Cafe Onion 拍照/咖啡后，晚饭去圣水土豆汤。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%B1%EC%88%98%EC%97%AD' target='_blank' rel='noopener'>圣水站<small>성수역</small></a><a href='https://map.naver.com/p/search/%EC%96%B4%EB%8B%88%EC%96%B8%20%EC%84%B1%EC%88%98' target='_blank' rel='noopener'>Cafe Onion 圣水<small>어니언 성수</small></a><a href='https://map.naver.com/p/search/%EC%86%8C%EB%AC%B8%EB%82%9C%EC%84%B1%EC%88%98%EA%B0%90%EC%9E%90%ED%83%95' target='_blank' rel='noopener'>圣水土豆汤<small>소문난성수감자탕</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/7-4 可选夜坐：圣水土豆汤 -&gt; 纛岛汉江公园</h3>
+                      <p>天气好、体力够就从圣水步行去纛岛汉江公园，看一眼汉江夜景；雨大直接回酒店。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0707_04_hangang.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0707_04_hangang.png" alt="可选夜坐：圣水土豆汤 -&gt; 纛岛汉江公园">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>从圣水土豆汤附近开 Naver Map 搜 뚝섬한강공원。</li><li>到江边只坐 30-45 分钟，不要拖太晚。</li><li>回程去纛岛游园地站 Ttukseom Resort / 뚝섬유원지역。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%86%8C%EB%AC%B8%EB%82%9C%EC%84%B1%EC%88%98%EA%B0%90%EC%9E%90%ED%83%95' target='_blank' rel='noopener'>圣水土豆汤<small>소문난성수감자탕</small></a><a href='https://map.naver.com/p/search/%EB%9A%9D%EC%84%AC%ED%95%9C%EA%B0%95%EA%B3%B5%EC%9B%90' target='_blank' rel='noopener'>纛岛汉江公园<small>뚝섬한강공원</small></a><a href='https://map.naver.com/p/search/%EB%9A%9D%EC%84%AC%EC%9C%A0%EC%9B%90%EC%A7%80%EC%97%AD' target='_blank' rel='noopener'>纛岛游园地站<small>뚝섬유원지역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/7-5 地铁回酒店：纛岛游园地 -&gt; 建大入口换 2号线 -&gt; 宣陵</h3>
+                      <p>从汉江公园回酒店最清楚：7号线 1站到建大入口，换 2号线回宣陵。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0707_05_subway_return.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0707_05_subway_return.png" alt="地铁回酒店：纛岛游园地 -&gt; 建大入口换 2号线 -&gt; 宣陵">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>纛岛游园地站 Ttukseom Resort / 뚝섬유원지역 坐 7号线，1站到建大入口站 Konkuk Univ. / 건대입구역。</li><li>建大入口站换 2号线，看 Jamsil / 잠실、Samseong / 삼성、Seolleung / 선릉 方向。</li></ol>
+                      <div class='station-line'><b>7号线 / 7호선</b><div class='chips'><span>纛岛游园地站<small>뚝섬유원지역</small></span><span>建大入口站<small>건대입구역</small></span></div></div><div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>建大入口站<small>건대입구역</small></span><span>九宜站<small>구의역</small></span><span>江边站<small>강변역</small></span><span>蚕室渡口站<small>잠실나루역</small></span><span>蚕室站<small>잠실역</small></span><span>蚕室新川站<small>잠실새내역</small></span><span>综合运动场站<small>종합운동장역</small></span><span>三成站<small>삼성역</small></span><span>宣陵站<small>선릉역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EB%9A%9D%EC%84%AC%EC%9C%A0%EC%9B%90%EC%A7%80%EC%97%AD' target='_blank' rel='noopener'>纛岛游园地站<small>뚝섬유원지역</small></a><a href='https://map.naver.com/p/search/%EA%B1%B4%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD' target='_blank' rel='noopener'>建大入口站<small>건대입구역</small></a><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/8">
+              <h2>7/8</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/8-1 地铁去弘大：宣陵 -&gt; 弘大入口</h3>
+                      <p>2号线直达，但站数多。不要慌，按站点条核对，坐到 Hongik Univ. / 홍대입구。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0708_01_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0708_01_subway.png" alt="地铁去弘大：宣陵 -&gt; 弘大入口">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站上 2号线，看 Gangnam / 강남、Sadang / 사당、Hapjeong / 합정、Hongik Univ. / 홍대입구 方向。</li><li>弘大入口站下车后不要急着出，先在 Naver Map 搜 T1 BASE CAMP 确认出口。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>驿三站<small>역삼역</small></span><span>江南站<small>강남역</small></span><span>教大站<small>교대역</small></span><span>瑞草站<small>서초역</small></span><span>方背站<small>방배역</small></span><span>舍堂站<small>사당역</small></span><span>落星垈站<small>낙성대역</small></span><span>首尔大入口站<small>서울대입구역</small></span><span>奉天站<small>봉천역</small></span><span>新林站<small>신림역</small></span><span>新大方站<small>신대방역</small></span><span>九老数码园区站<small>구로디지털단지역</small></span><span>大林站<small>대림역</small></span><span>新道林站<small>신도림역</small></span><span>文来站<small>문래역</small></span><span>永登浦区厅站<small>영등포구청역</small></span><span>堂山站<small>당산역</small></span><span>合井站<small>합정역</small></span><span>弘大入口站<small>홍대입구역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD' target='_blank' rel='noopener'>弘大入口站<small>홍대입구역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/8-2 步行放大：弘大入口站 -&gt; T1 BASE CAMP</h3>
+                      <p>T1 BASE CAMP 在 147 Yanghwa-ro / 양화로 147，B1。买周边、拍照、打游戏都在这一次解决。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0708_02_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0708_02_walk.png" alt="步行放大：弘大入口站 -&gt; T1 BASE CAMP">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>到弘大入口站后搜 T1 BASE CAMP / T1 베이스캠프。</li><li>目标是地下 B1，不是江南 T1 HQ SHOP。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD' target='_blank' rel='noopener'>弘大入口站<small>홍대입구역</small></a><a href='https://map.naver.com/p/search/T1%20BASE%20CAMP%20147%20Yanghwa-ro' target='_blank' rel='noopener'>T1 BASE CAMP<small>T1 베이스캠프</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/9">
+              <h2>7/9</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/9-1 步行放大：酒店 -&gt; COEX Poster</h3>
+                      <p>Poster 日上午不坐车，直接走到 COEX。提前到，留时间找板位和贴 poster。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0709_01_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0709_01_walk.png" alt="步行放大：酒店 -&gt; COEX Poster">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>08:15 左右出发更稳。</li><li>到 Hall A / Hall B2 East Gate 附近按 ICML 指示找 poster 区。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/9-2 地铁去狎鸥亭罗德奥：宣陵 -&gt; 狎鸥亭罗德奥</h3>
+                      <p>水仁盆唐线 3站，Exit 5 去 Haus Dosan / Tamburins 更顺。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0709_02_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0709_02_subway.png" alt="地铁去狎鸥亭罗德奥：宣陵 -&gt; 狎鸥亭罗德奥">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站上水仁盆唐线，看 Wangsimni / 왕십리、Cheongnyangni / 청량리 方向。</li><li>狎鸥亭罗德奥站走 Exit 5。</li></ol>
+                      <div class='station-line'><b>水仁盆唐线 / 수인분당선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>宣靖陵站<small>선정릉역</small></span><span>江南区厅站<small>강남구청역</small></span><span>狎鸥亭罗德奥站 Exit 5<small>압구정로데오역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%EC%95%95%EA%B5%AC%EC%A0%95%EB%A1%9C%EB%8D%B0%EC%98%A4%EC%97%AD' target='_blank' rel='noopener'>狎鸥亭罗德奥站 Exit 5<small>압구정로데오역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/9-3 步行放大：狎鸥亭罗德奥 -&gt; Haus Dosan / Tamburins</h3>
+                      <p>暗恋对象礼物可以在 Tamburins / Gentle Monster 这一带认真挑。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0709_03_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0709_03_walk.png" alt="步行放大：狎鸥亭罗德奥 -&gt; Haus Dosan / Tamburins">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>Exit 5 出站后搜 Haus Dosan。</li><li>预算建议 30,000-80,000 KRW / 132-352 RMB。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%95%95%EA%B5%AC%EC%A0%95%EB%A1%9C%EB%8D%B0%EC%98%A4%EC%97%AD' target='_blank' rel='noopener'>狎鸥亭罗德奥站 Exit 5<small>압구정로데오역</small></a><a href='https://map.naver.com/p/search/Haus%20Dosan%20Seoul%20Tamburins' target='_blank' rel='noopener'>Haus Dosan / Tamburins<small>하우스 도산</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/10">
+              <h2>7/10</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/10-1 地铁去 LoL Park：宣陵 -&gt; 市厅换乘 -&gt; 钟阁</h3>
+                      <p>2号线到市厅，换 1号线 1站到钟阁。图上按站点顺序标记。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0710_01_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0710_01_subway.png" alt="地铁去 LoL Park：宣陵 -&gt; 市厅换乘 -&gt; 钟阁">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站上 2号线，看 Samseong / 삼성、Jamsil / 잠실、Wangsimni / 왕십리、City Hall / 시청 方向。</li><li>市厅站换 1号线，到钟阁站 Jonggak / 종각역。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>三成站<small>삼성역</small></span><span>综合运动场站<small>종합운동장역</small></span><span>蚕室新川站<small>잠실새내역</small></span><span>蚕室站<small>잠실역</small></span><span>蚕室渡口站<small>잠실나루역</small></span><span>江边站<small>강변역</small></span><span>九宜站<small>구의역</small></span><span>建大入口站<small>건대입구역</small></span><span>圣水站<small>성수역</small></span><span>纛岛站<small>뚝섬역</small></span><span>汉阳大站<small>한양대역</small></span><span>往十里站<small>왕십리역</small></span><span>上往十里站<small>상왕십리역</small></span><span>新堂站<small>신당역</small></span><span>东大门历史文化公园站<small>동대문역사문화공원역</small></span><span>乙支路4街站<small>을지로4가역</small></span><span>乙支路3街站<small>을지로3가역</small></span><span>乙支路入口站<small>을지로입구역</small></span><span>市厅站<small>시청역</small></span></div></div><div class='station-line'><b>1号线 / 1호선</b><div class='chips'><span>市厅站<small>시청역</small></span><span>钟阁站<small>종각역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%EC%8B%9C%EC%B2%AD%EC%97%AD' target='_blank' rel='noopener'>市厅站<small>시청역</small></a><a href='https://map.naver.com/p/search/%EC%A2%85%EA%B0%81%EC%97%AD' target='_blank' rel='noopener'>钟阁站<small>종각역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/10-2 步行放大：钟阁站 Exit 1 -&gt; LoL Park</h3>
+                      <p>LoL Park 在 Gran Seoul 3F。钟阁站 Exit 1 出来后很近。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0710_02_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0710_02_walk.png" alt="步行放大：钟阁站 Exit 1 -&gt; LoL Park">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>钟阁站 Exit 1。</li><li>进 Gran Seoul 后上 3F 找 LoL Park / 롤파크。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%A2%85%EA%B0%81%EC%97%AD' target='_blank' rel='noopener'>钟阁站<small>종각역</small></a><a href='https://map.naver.com/p/search/LoL%20Park%20Gran%20Seoul%203F' target='_blank' rel='noopener'>LoL Park / Gran Seoul 3F<small>롤파크</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/10-3 地铁去广藏市场：钟阁 -&gt; 钟路5街</h3>
+                      <p>1号线两站，钟路5街 Exit 8 到广藏市场最顺。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0710_03_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0710_03_subway.png" alt="地铁去广藏市场：钟阁 -&gt; 钟路5街">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>钟阁站上 1号线，看 Dongdaemun / 동대문、Cheongnyangni / 청량리 方向。</li><li>钟路5街站 Exit 8。</li></ol>
+                      <div class='station-line'><b>1号线 / 1호선</b><div class='chips'><span>钟阁站<small>종각역</small></span><span>钟路3街站<small>종로3가역</small></span><span>钟路5街站<small>종로5가역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%A2%85%EA%B0%81%EC%97%AD' target='_blank' rel='noopener'>钟阁站<small>종각역</small></a><a href='https://map.naver.com/p/search/%EC%A2%85%EB%A1%9C5%EA%B0%80%EC%97%AD' target='_blank' rel='noopener'>钟路5街站<small>종로5가역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/10-4 步行放大：钟路5街 -&gt; 广藏市场 -&gt; DDP</h3>
+                      <p>这段不打车，直接步行。广藏市场到 DDP 大约 15-25 分钟，按 Naver Map 实时路线走。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0710_04_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0710_04_walk.png" alt="步行放大：钟路5街 -&gt; 广藏市场 -&gt; DDP">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>钟路5街 Exit 8 出站后先进广藏市场。</li><li>吃完从广藏市场步行去 DDP。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%A2%85%EB%A1%9C5%EA%B0%80%EC%97%AD' target='_blank' rel='noopener'>钟路5街站<small>종로5가역</small></a><a href='https://map.naver.com/p/search/%EA%B4%91%EC%9E%A5%EC%8B%9C%EC%9E%A5' target='_blank' rel='noopener'>广藏市场<small>광장시장</small></a><a href='https://map.naver.com/p/search/%EB%8F%99%EB%8C%80%EB%AC%B8%EB%94%94%EC%9E%90%EC%9D%B8%ED%94%8C%EB%9D%BC%EC%9E%90' target='_blank' rel='noopener'>DDP 东大门设计广场<small>동대문디자인플라자</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/10-5 地铁：DDP -&gt; 明洞 -&gt; 舍堂换乘 -&gt; 宣陵</h3>
+                      <p>DDP 先到明洞；晚上明洞再按 4号线 + 2号线回宣陵。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0710_05_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0710_05_subway.png" alt="地铁：DDP -&gt; 明洞 -&gt; 舍堂换乘 -&gt; 宣陵">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>DDP 最近用东大门历史文化公园站，4号线到明洞。</li><li>明洞回酒店：4号线到舍堂，换 2号线回宣陵。</li></ol>
+                      <div class='station-line'><b>4号线 / 4호선</b><div class='chips'><span>东大门历史文化公园站<small>동대문역사문화공원역</small></span><span>忠武路站<small>충무로역</small></span><span>明洞站<small>명동역</small></span></div></div><div class='station-line'><b>4号线 / 4호선</b><div class='chips'><span>明洞站<small>명동역</small></span><span>会贤站<small>회현역</small></span><span>首尔站<small>서울역</small></span><span>淑大入口站<small>숙대입구역</small></span><span>三角地站<small>삼각지역</small></span><span>新龙山站<small>신용산역</small></span><span>二村站<small>이촌역</small></span><span>铜雀站<small>동작역</small></span><span>总神大入口/梨水站<small>총신대입구(이수)역</small></span><span>舍堂站<small>사당역</small></span></div></div><div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>舍堂站<small>사당역</small></span><span>方背站<small>방배역</small></span><span>瑞草站<small>서초역</small></span><span>教大站<small>교대역</small></span><span>江南站<small>강남역</small></span><span>驿三站<small>역삼역</small></span><span>宣陵站<small>선릉역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EB%8F%99%EB%8C%80%EB%AC%B8%EC%97%AD%EC%82%AC%EB%AC%B8%ED%99%94%EA%B3%B5%EC%9B%90%EC%97%AD' target='_blank' rel='noopener'>东大门历史文化公园站<small>동대문역사문화공원역</small></a><a href='https://map.naver.com/p/search/%EB%AA%85%EB%8F%99%EC%97%AD' target='_blank' rel='noopener'>明洞站<small>명동역</small></a><a href='https://map.naver.com/p/search/%EC%82%AC%EB%8B%B9%EC%97%AD' target='_blank' rel='noopener'>舍堂站<small>사당역</small></a><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/11">
+              <h2>7/11</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/11-1 步行放大：酒店 -&gt; COEX / 最后会议</h3>
+                      <p>白天 workshop / COEX 最后购物，全程步行。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0711_01_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0711_01_walk.png" alt="步行放大：酒店 -&gt; COEX / 最后会议">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>上午去 COEX，下午可回酒店放东西。</li><li>晚上开始整理行李，液体集中托运。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/11-2 可选地铁：宣陵 -&gt; 江南站</h3>
+                      <p>如果还想补货，2号线两站到江南。可以不去。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0711_02_subway.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0711_02_subway.png" alt="可选地铁：宣陵 -&gt; 江南站">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>宣陵站坐 2号线，看 Gangnam / 강남 方向。</li><li>江南站 Exit 10/11 一带适合补买小物。</li></ol>
+                      <div class='station-line'><b>2号线 / 2호선</b><div class='chips'><span>宣陵站<small>선릉역</small></span><span>驿三站<small>역삼역</small></span><span>江南站<small>강남역</small></span></div></div>
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EC%84%A0%EB%A6%89%EC%97%AD' target='_blank' rel='noopener'>宣陵站<small>선릉역</small></a><a href='https://map.naver.com/p/search/%EA%B0%95%EB%82%A8%EC%97%AD' target='_blank' rel='noopener'>江南站<small>강남역</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/11-3 步行放大：江南站 Exit 10/11 周边</h3>
+                      <p>只作为补货图；不想去就跳过，直接在 COEX 买完。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0711_03_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0711_03_walk.png" alt="步行放大：江南站 Exit 10/11 周边">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>江南站 Exit 10/11 出来后沿主路逛。</li><li>只补轻便小件，不买难托运的大液体。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/%EA%B0%95%EB%82%A8%EC%97%AD' target='_blank' rel='noopener'>江南站<small>강남역</small></a><a href='https://map.naver.com/p/search/Gangnam%20Station%20Exit%2010%20shopping' target='_blank' rel='noopener'>江南站购物区<small>강남역 쇼핑</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            
+            <section class="day" id="d7/12">
+              <h2>7/12</h2>
+              
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/12-1 步行放大：酒店退房 -&gt; COEX / CALT</h3>
+                      <p>11:00 退房后寄存行李；下午取行李后步行去 COEX City Airport Terminal 坐 6103。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0712_01_walk.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0712_01_walk.png" alt="步行放大：酒店退房 -&gt; COEX / CALT">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>退房后问前台：짐 보관 가능할까요? / 能寄存行李吗？</li><li>16:30 左右取行李，步行去 CALT。不要打车。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/GOYOO%20INN%20%26%20CABINS%2011-16%20Teheran-ro%2077-gil%20Seoul' target='_blank' rel='noopener'>酒店 GOYOO<small>고유 인 앤 캐빈</small></a><a href='https://map.naver.com/p/search/COEX%20Seoul' target='_blank' rel='noopener'>COEX / ICML<small>코엑스</small></a><a href='https://map.naver.com/p/search/COEX%20City%20Airport%20Terminal%20Seoul' target='_blank' rel='noopener'>COEX City Airport Terminal<small>도심공항터미널</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="map-card">
+                  <div class="card-head">
+                    <div>
+                      <h3>7/12-2 机场巴士：CALT -&gt; 仁川机场</h3>
+                      <p>17:00-17:30 左右坐 6103 去仁川机场。先确认航班是 T1 还是 T2。</p>
+                    </div>
+                    <a class="open-img" href="route_maps_detailed/0712_02_bus.png" target="_blank">打开大图</a>
+                  </div>
+                  <img src="route_maps_detailed/0712_02_bus.png" alt="机场巴士：CALT -&gt; 仁川机场">
+                  <div class="below">
+                    <div>
+                      <h4>照着走</h4>
+                      <ol><li>CALT / 도심공항터미널 上 6103。</li><li>21:30 飞机，17:00-17:30 上车比较稳。</li></ol>
+                      
+                    </div>
+                    <div>
+                      <h4>Naver 快速搜索</h4>
+                      <div class="quick"><a href='https://map.naver.com/p/search/COEX%20City%20Airport%20Terminal%20Seoul' target='_blank' rel='noopener'>COEX City Airport Terminal<small>도심공항터미널</small></a><a href='https://map.naver.com/p/search/Incheon%20Airport%20Terminal%201' target='_blank' rel='noopener'>仁川机场 T1<small>인천공항 제1터미널</small></a><a href='https://map.naver.com/p/search/Incheon%20Airport%20Terminal%202' target='_blank' rel='noopener'>仁川机场 T2<small>인천공항 제2터미널</small></a></div>
+                    </div>
+                  </div>
+                </article>
+                
+            </section>
+            </main>
+</body>
+</html>

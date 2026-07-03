@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>首尔 ICML 翻页行程单</title>
+  <style>
+    :root {
+      --bg: #f4f2ed;
+      --panel: #fffdf8;
+      --ink: #1e2428;
+      --muted: #626b70;
+      --line: #d9d1c4;
+      --accent: #0b6b6f;
+      --accent-2: #c24a2c;
+      --soft: #eaf3f2;
+      --shadow: 0 22px 55px rgba(45, 38, 28, 0.17);
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Noto Sans KR", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+      background: #fcfaf4;
+    }
+
+    .brand {
+      padding: 2px 4px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .toc-title {
+      margin: 18px 4px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .toc {
+      display: grid;
+      gap: 8px;
+      padding: 0 2px 20px;
+    }
+
+    .toc button {
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      padding: 10px 11px;
+      text-align: left;
+      line-height: 1.35;
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .toc button:hover,
+    .toc button:focus-visible {
+      outline: none;
+      background: var(--soft);
+      border-color: #b8d9d7;
+    }
+
+    .toc button.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .toc .page-index {
+      display: block;
+      font-size: 12px;
+      opacity: 0.72;
+      margin-bottom: 2px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px clamp(14px, 3vw, 38px) 34px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin: 0 auto 18px;
+      max-width: 1120px;
+    }
+
+    .nav-group,
+    .tool-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .status strong {
+      display: block;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--ink);
+      cursor: pointer;
+      min-height: 40px;
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn.primary:hover,
+    .btn.primary:focus-visible {
+      color: #fff;
+      background: #09595c;
+    }
+
+    .page-stage {
+      position: relative;
+      max-width: 1120px;
+      margin: 0 auto;
+      min-height: calc(100vh - 112px);
+      perspective: 1800px;
+    }
+
+    .page {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 3.4vw, 44px);
+      min-height: calc(100vh - 126px);
+      overflow: auto;
+      transform-origin: center left;
+    }
+
+    .page.active {
+      display: block;
+      animation: pageIn 260ms ease both;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: rotateY(-7deg) translateX(8px);
+      }
+      to {
+        opacity: 1;
+        transform: rotateY(0deg) translateX(0);
+      }
+    }
+
+    .page h1,
+    .page h2,
+    .page h3 {
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .page h1 {
+      margin: 0 0 14px;
+      font-size: clamp(26px, 4vw, 42px);
+      color: #17383b;
+    }
+
+    .page h2 {
+      margin: 0 0 18px;
+      font-size: clamp(22px, 3vw, 32px);
+      color: #17383b;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .page h3 {
+      margin: 22px 0 10px;
+      font-size: 20px;
+    }
+
+    .page p,
+    .page li {
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .page p {
+      margin: 10px 0;
+    }
+
+    .page ul {
+      margin: 8px 0 18px;
+      padding-left: 1.25em;
+    }
+
+    .page li {
+      margin: 4px 0;
+    }
+
+    .page strong {
+      color: #111;
+    }
+
+    .page hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 22px 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 14px 0 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e8e1d7;
+      border-right: 1px solid #eee7dd;
+      padding: 10px 12px;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      background: #eaf3f2;
+      color: #17383b;
+      font-weight: 700;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    td:last-child,
+    th:last-child {
+      white-space: nowrap;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(11, 107, 111, 0.35);
+    }
+
+    a:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      margin-top: 28px;
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .keyboard-hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 14px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      line-height: 1.55;
+    }
+
+    .mobile-menu {
+      display: none;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--ink);
+      min-height: 42px;
+      padding: 0 12px;
+    }
+
+    .source-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 14px;
+      }
+
+      .toc,
+      .keyboard-hint {
+        display: none;
+      }
+
+      .mobile-menu {
+        display: block;
+        margin-top: 12px;
+      }
+
+      .main {
+        padding: 14px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        order: -1;
+      }
+
+      .nav-group,
+      .tool-group {
+        justify-content: center;
+      }
+
+      .page {
+        min-height: calc(100vh - 210px);
+        padding: 18px;
+      }
+
+      .page p,
+      .page li {
+        font-size: 15px;
+      }
+
+      table {
+        min-width: 760px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .sidebar,
+      .toolbar,
+      .page-footer {
+        display: none !important;
+      }
+
+      .app-shell {
+        display: block;
+      }
+
+      .main {
+        padding: 0;
+      }
+
+      .page-stage {
+        max-width: none;
+        min-height: 0;
+      }
+
+      .page,
+      .page.active {
+        display: block !important;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        min-height: 0;
+        padding: 18mm 12mm;
+        page-break-after: always;
+        animation: none;
+      }
+
+      .table-wrap {
+        overflow: visible;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 11px;
+      }
+
+      th {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>首尔 ICML 翻页行程单</h1>
+        <p>2026-07-04 至 2026-07-12<br>COEX 会议、T1、LoL Park、购物与返程。</p>
+        <p><a href="seoul_icml_daily_maps_zh.html">打开每日路线地图</a></p>
+      </div>
+      <select id="pageSelect" class="mobile-menu" aria-label="选择页面"></select>
+      <div class="toc-title">页面目录</div>
+      <nav id="toc" class="toc" aria-label="页面目录"></nav>
+      <div class="keyboard-hint">快捷键：← / → 翻页，Home 回首页，End 到最后一页。打印按钮会展开全部页面。</div>
+      <div class="source-note">网页内嵌了完整中文行程原文；如需核对，可在 HTML 源码中搜索任意文字。</div>
+    </aside>
+    <main class="main">
+      <div class="toolbar" role="navigation" aria-label="翻页控制">
+        <div class="nav-group">
+          <button class="btn" id="firstBtn" type="button" title="第一页">|←</button>
+          <button class="btn primary" id="prevBtn" type="button" title="上一页">← 上一页</button>
+        </div>
+        <div class="status">
+          <strong id="pageTitle">加载中</strong>
+          <span id="pageCounter">第 1 / 1 页</span>
+        </div>
+        <div class="tool-group">
+          <button class="btn primary" id="nextBtn" type="button" title="下一页">下一页 →</button>
+          <button class="btn" id="lastBtn" type="button" title="最后一页">→|</button>
+          <button class="btn" id="printBtn" type="button" title="打印或保存为 PDF">打印 / PDF</button>
+        </div>
+      </div>
+      <section id="pages" class="page-stage" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <script id="sourceMarkdown" type="text/plain"># 首尔 ICML 每日详细行程单
+
+日期：2026-07-04 至 2026-07-12  
+酒店：GOYOO INN & CABINS，5F, 143-14 Samseong-dong, Gangnam-gu, Seoul 06159  
+会议：ICML 2026，地点 COEX / 코엑스  
+重点：7月6日注册拿胸牌，7月9日上午 poster，保留 T1、LoL Park、购物、首尔市区游玩；天气好时补南山夜景和汉江夜坐
+
+汇率估算：1 RMB ~= 227 KRW。10,000 KRW ~= 44 RMB。实际刷卡按银行入账汇率。
+
+更新说明：
+- 你会自己带雨伞，所以不再把雨伞列入购物项；每天按天气决定要不要随身带。
+- T1 只安排一次，去弘大 T1 BASE CAMP / T1 베이스캠프。江南 T1 HQ SHOP 只是更近的周边店，不再单独去。
+- 7月12日按 21:30 从仁川机场出发/起飞安排；酒店 11:00 退房，退房后先寄存行李。
+
+---
+
+## 先装好这些 App
+
+- Naver Map / 네이버 지도：韩国导航最重要，查地铁出口、步行路线、餐馆。
+- Papago / 파파고：翻译菜单、问路。
+- 不按打车规划；市内地面移动优先步行，跨区坐地铁，机场往返坐 6103。
+- ICML App 或 ICML 官网：查会议日程和 poster 信息。
+
+---
+
+## 常用地点和车站中英韩对照
+
+- 酒店：GOYOO INN & CABINS，三成洞 Samseong-dong / 삼성동
+- 最近常用站：宣陵站 Seolleung / 선릉역，2号线 Line 2 / 2호선 + 水仁盆唐线 Suin-Bundang Line / 수인분당선。订房平台显示酒店距宣陵站约 0.46 km，按 8 分钟步行估算。
+- 去 COEX 常用站：三成站 Samseong / 삼성역，2号线 Line 2 / 2호선，5/6号出口
+- COEX 另一个站：奉恩寺站 Bongeunsa / 봉은사역，9号线 Line 9 / 9호선，7号出口
+- 三成中央站：Samseong Jungang / 삼성중앙역，9号线 Line 9 / 9호선
+- 景福宫站：Gyeongbokgung / 경복궁역，3号线 Line 3 / 3호선，5号出口
+- 安国站：Anguk / 안국역，3号线 Line 3 / 3호선
+- 明洞站：Myeongdong / 명동역，4号线 Line 4 / 4호선，6号出口
+- 弘大入口站：Hongik Univ. / 홍대입구역，2号线 Line 2 / 2호선
+- 蚕室站：Jamsil / 잠실역，2号线 Line 2 / 2호선
+- 宣靖陵站：Seonjeongneung / 선정릉역，水仁盆唐线 + 9号线
+- 圣水站：Seongsu / 성수역，2号线 Line 2 / 2호선
+- 狎鸥亭罗德奥站：Apgujeong Rodeo / 압구정로데오역，水仁盆唐线
+- 钟阁站：Jonggak / 종각역，1号线 Line 1 / 1호선
+- 钟路5街站：Jongno 5-ga / 종로5가역，1号线 Line 1 / 1호선
+- 江南站：Gangnam / 강남역，2号线 Line 2 / 2호선
+- 南山缆车：Namsan Cable Car / 남산 케이블카，明洞步行过去
+- N 首尔塔：N Seoul Tower / N서울타워
+- 纛岛汉江公园：Ttukseom Hangang Park / 뚝섬한강공원
+- 纛岛游园地站：Ttukseom Resort / 뚝섬유원지역，7号线 Line 7 / 7호선
+
+---
+
+## T1 两家店怎么选
+
+- T1 HQ SHOP 江南店 / T1 HQ SHOP 강남：主要是周边店，地址在江南区，离你酒店近，但不是主要打游戏的地方。适合只想顺路买一点周边的人。
+- T1 BASE CAMP 弘大店 / T1 베이스캠프 홍대：PC 房 + T1 周边 + 拍照空间，更符合你“买周边、打会游戏、拍照”的目标。
+- 本行程只保留弘大 T1 BASE CAMP。这样 7月7日不重复跑 T1，7月8日集中买周边和打游戏。
+
+---
+
+## 交通核验总表：到底要不要坐车
+
+原则：酒店到 COEX 基本走路；跨区才坐地铁；机场往返坐 6103 最稳。出门前用 Naver Map / 네이버 지도 再搜一次目的地，主要确认“当前出口”和“末班/实时延误”。
+
+| 日期 | 交通结论 | 主路线 | 预计耗时 | 核验/注意 |
+|---|---|---|---|---|
+| 7/4 到达 | 要坐 6103 机场巴士 | 仁川 T1 1F 7A-3 / T2 B1 21号站台 -> 6103 -> COEX City Airport Terminal / 도심공항터미널 -> 步行到酒店 | T1 到 COEX 约 65 分钟；T2 约 85 分钟 | 官方 6103 成人 18,000 KRW；到首尔方向 T1 06:00-23:30、T2 05:40-23:10 |
+| 7/5 景福宫/明洞 | 要坐地铁 | 宣陵站 Line 2 -> 乙支路3街站 Euljiro 3-ga / 을지로3가역 换 Line 3 -> 景福宫站 Exit 5；晚上明洞站 Line 4 -> 舍堂站 Sadang / 사당역 换 Line 2 -> 宣陵站 | 单程约 45-55 分钟 | 这比去三成中央站更不容易迷路，因为宣陵站离酒店最近 |
+| 7/5 南山夜景可选 | 步行 + 南山缆车 | 明洞站 Myeongdong / 명동역 -> 步行到南山缆车 Namsan Cable Car / 남산 케이블카 -> N 首尔塔 N Seoul Tower / N서울타워 -> 回明洞站 | 明洞到缆车下站步行约 10-15 分钟；缆车排队另算 | 天气好、体力够才去；只看夜景可不买观景台票 |
+| 7/6 COEX | 正常不用坐车 | 酒店 -> 步行 -> COEX | 10-15 分钟 | 雨很大才坐：宣陵站 Line 2 -> 三成站 1站，Exit 5/6 直连 COEX |
+| 7/6 蚕室 | 要坐地铁 | 三成站 Line 2 -> 蚕室站 Jamsil / 잠실역，Exit 1/2/11 看 Lotte World Mall 指示 | 约 10-15 分钟 | 三成到蚕室 3站；商场和地铁站连接很好 |
+| 7/7 圣水 | 要坐地铁 | 宣陵站 Line 2 -> 圣水站 Seongsu / 성수역，Exit 2 去 Cafe Onion | 约 25-35 分钟含步行 | 去程看 Jamsil / Wangsimni / Seongsu 方向；回程看 Konkuk Univ. / Jamsil / Samseong / Seolleung 方向 |
+| 7/7 汉江可选 | 步行 + 7号线换2号线 | 圣水土豆汤 / 소문난성수감자탕 -> 步行到纛岛汉江公园 Ttukseom Hangang Park / 뚝섬한강공원 -> 纛岛游园地站 Ttukseom Resort / 뚝섬유원지역 -> 建大入口站 Konkuk Univ. / 건대입구역 换 2号线 -> 宣陵站 | 汉江步行约 25-35 分钟；回酒店约 35-45 分钟 | 天气好才去；只坐 30-45 分钟，不拖太晚 |
+| 7/8 弘大 T1 | 要坐地铁 | 宣陵站 Line 2 -> 弘大入口站 Hongik Univ. / 홍대입구역 -> T1 BASE CAMP，147 Yanghwa-ro / 양화로 147 B1 | 约 50-60 分钟 | 去程看 Gangnam / Sadang / Hapjeong / Hongik Univ. 方向；出口用 Naver Map 最终确认，Exit 1 和 Exit 11 都有资料能到 |
+| 7/9 poster | 正常不用坐车 | 酒店 -> 步行 -> COEX Hall A / Hall B2 East Gate | 10-15 分钟 | 这是最重要的一天，不安排远距离移动 |
+| 7/9 狎鸥亭 | 要坐地铁 | 宣陵站 Suin-Bundang Line -> 狎鸥亭罗德奥站 Apgujeong Rodeo / 압구정로데오역 Exit 5 -> Haus Dosan/Tamburins | 约 20-30 分钟含步行 | Exit 5 更适合 Haus Dosan；Exit 6 更适合狎鸥亭罗德奥街 |
+| 7/10 LoL Park | 要坐地铁 | 宣陵站 Line 2 -> 市厅站 City Hall / 시청역 换 Line 1 -> 钟阁站 Jonggak / 종각역 Exit 1 -> Gran Seoul 3F | 约 45-55 分钟 | LoL Park 官方/旅游信息都指向 Gran Seoul 3F、钟阁站 Exit 1 |
+| 7/10 广藏市场 | 要坐 Line 1 两站 | 钟阁站 Line 1 -> 钟路5街站 Jongno 5-ga / 종로5가역 Exit 8 | 约 10-15 分钟 | 出口 8 到市场约 1-3 分钟 |
+| 7/10 DDP | 直接走路 | 广藏市场 -> 步行约 15-25 分钟到 DDP | 步行 15-25 分钟 | 这段不坐地铁、不打车，走路反而少换乘 |
+| 7/11 江南站可选 | 要坐地铁但很近 | 宣陵站 Line 2 -> 江南站 Gangnam / 강남역，Exit 10/11 | 约 10-15 分钟 | 只去最后补买，不想逛可跳过 |
+| 7/12 机场 | 要坐 6103 机场巴士 | 酒店取行李 -> COEX City Airport Terminal -> 6103 -> 仁川机场 | T1 约 65 分钟；T2 约 85 分钟 | 官方去机场方向首班 04:10、末班 21:00；你 17:00-17:30 上车很稳 |
+
+坐地铁不迷路规则：
+- 先看线号和颜色：2号线是绿色，3号线橙色，4号线蓝色，1号线深蓝，水仁盆唐线是黄色。
+- 再看方向站：不要只看“内环/外环”，直接看站台牌上有没有下一批方向站，比如 Jamsil / 잠실、Gangnam / 강남、Hongik Univ. / 홍대입구。
+- 坐错方向不要出闸：下一站下车，到对面站台坐回来即可。
+- 出口如果和这里写的不一致：以 Naver Map 当天给的出口为准；有些大站不同出口都能到，只是步行方向不同。
+- 真找不到车时：先不要乱走远，站内找 Information / 안내 或问工作人员，把手机给他看韩文站名。例如“宣陵站 Seolleung / 선릉역”“弘大入口站 Hongik Univ. / 홍대입구역”“COEX / 코엑스”。
+- 迷路兜底：先原路退回最近地铁站/大路口，找 Information / 안내 或便利店店员，把手机里的韩文站名给对方看；如果时间不够，就删掉下一站，不临时改成打车。
+
+---
+
+## 总日程表
+
+| 日期 | 主题 | 主要路线 | 购物重点 | 预算估算 |
+|---|---|---|---|---:|
+| 7/4 周六 | 到达、入住、熟悉 COEX | 仁川机场 -> 6103 机场巴士 -> COEX -> 酒店 | T-money、日用品 | 55,000-90,000 KRW / 242-396 RMB |
+| 7/5 周日 | 景福宫、北村、仁寺洞、明洞主购物；天气好加南山夜景 | 2号线 + 3号线 + 4号线；明洞步行到南山缆车 | 护肤、面膜、家人礼物 | 120,000-305,000 KRW / 529-1,344 RMB |
+| 7/6 周一 | ICML 注册、熟悉会场、蚕室 | 步行到 COEX；晚上 2号线到蚕室 | COEX 轻购物 | 45,000-90,000 KRW / 198-396 RMB |
+| 7/7 周二 | ICML + 圣水洞；天气好加纛岛汉江公园 | 2号线到圣水；可从汉江坐 7号线换 2号线回酒店 | 咖啡、设计小物、文具 | 50,000-125,000 KRW / 220-551 RMB |
+| 7/8 周三 | 弘大 T1 BASE CAMP | 2号线直达弘大入口站 | T1 主购物、朋友礼物 | 100,000-280,000 KRW / 441-1,233 RMB |
+| 7/9 周四 | Poster 日 + 狎鸥亭罗德奥 | 步行到 COEX；水仁盆唐线到狎鸥亭罗德奥 | 暗恋对象礼物 | 60,000-160,000 KRW / 264-705 RMB |
+| 7/10 周五 | LoL Park、广藏市场、DDP/明洞 | 2号线 + 1号线/4号线 | LoL/Riot 周边、补买 | 80,000-200,000 KRW / 352-881 RMB |
+| 7/11 周六 | ICML workshop、最后购物、收行李 | 步行 COEX；可 2号线到江南 | 家人朋友最后补货 | 100,000-280,000 KRW / 441-1,233 RMB |
+| 7/12 周日 | 11:00 退房，白天轻松收尾，晚上去仁川机场 | 寄存行李 + 6103 机场巴士 | 只买轻便小件 | 70,000-170,000 KRW / 308-749 RMB |
+
+不含机酒的总预算建议：775,000-1,700,000 KRW / 约 3,414-7,489 RMB。主要差异取决于你买多少 T1 周边、礼物，以及南山是否买观景台票。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 1 页：7/4 周六，到达首尔、入住、COEX 轻逛
+
+目标：顺利入境，买好交通卡和现金，安全到酒店，晚上只轻松熟悉 COEX。
+
+随身准备：
+- 护照、签证/入境材料、酒店地址截图
+- Visa / Mastercard
+- 手机网络：eSIM 或漫游要能用
+- 现金目标：200,000-300,000 KRW / 881-1,322 RMB
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 12:30 | 抵达仁川机场 Incheon Airport / 인천공항 | 跟着 Immigration / 입국심사 入境，再取行李。入境地址填 GOYOO INN & CABINS, 5F, 143-14 Samseong-dong, Gangnam-gu, Seoul 06159。 | 0 |
+| 13:30-14:10 | 取现金、买 T-money | 在机场 ATM 取韩元现金。去 CU / GS25 / 7-Eleven 买 T-money。先充 50,000 KRW / 220 RMB。 | 卡 3,000-5,000 KRW / 13-22 RMB；充值 50,000 KRW / 220 RMB |
+| 14:10-14:40 | 找 6103 机场巴士 | 如果在 T1：去 1F 7A-3 站台。如果在 T2：去 B1 21号站台。车写 6103，方向 COEX / 코엑스。 | 18,000 KRW / 79 RMB |
+| 14:40-16:10 | 机场巴士到 COEX | 坐到 COEX City Airport Terminal / 도심공항터미널 或 Samseong Station / 삼성역 一带。 | 已含 |
+| 16:10-16:35 | COEX 到酒店 | 用 Naver Map 步行到 GOYOO。拖行李就走慢一点，按 20-25 分钟预留。 | 步行 0 |
+| 16:30-17:30 | 入住、洗澡、充电 | 确认 Wi-Fi、门禁、退房时间。顺手问前台 7/12 11:00 退房后能否寄存行李。 | 0 |
+| 18:00-19:30 | 晚饭 | 推荐：COEX Mall 里的河东馆 Hadongkwan / 하동관，吃牛骨汤 gomtang / 곰탕。排队太长就吃 COEX 美食广场。 | 15,000-25,000 KRW / 66-110 RMB |
+| 19:30-21:00 | 轻松逛 | 步行逛 COEX Mall / 코엑스몰、Starfield Library / 별마당도서관、奉恩寺 Bongeunsa / 봉은사 外面。 | 0-10,000 KRW / 0-44 RMB |
+| 21:00-22:00 | 回酒店休息 | 给手机、充电宝充电。把护照、现金、T-money、自带雨伞放好。 | 0 |
+
+今天不买大件礼物，只买：
+- 瓶装水、转换头、洗漱用品、小零食。雨伞你自己带，不用买。
+- 如果看到喜欢的 T-money 卡面可以买。
+
+风险控制：
+- 如果入境很慢，晚上只吃饭，不逛。
+- 保留至少 20,000 KRW / 88 RMB 现金应急。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 2 页：7/5 周日，景福宫、北村、仁寺洞、明洞购物，南山夜景可选
+
+目标：完成首尔经典路线，做第一次大购物；天气好、体力够时补上南山 / N 首尔塔夜景。
+
+随身：
+- 护照原件：退税用
+- 自带雨伞、防晒、水
+- 折叠购物袋
+- T-money 余额至少 20,000 KRW / 88 RMB
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:30 | 早餐 | 酒店附近便利店买紫菜包饭 kimbap / 김밥、牛奶、咖啡，或附近面包店。 | 5,000-10,000 KRW / 22-44 RMB |
+| 09:00 | 去景福宫 | 步行到宣陵站 Seolleung / 선릉역，坐 2号线 Line 2 / 2호선。方向看 Samseong / 삼성、Jamsil / 잠실、Wangsimni / 왕십리、Euljiro 3-ga / 을지로3가。到乙支路3街站 Euljiro 3-ga / 을지로3가역 换 3号线 Line 3 / 3호선，方向 Daehwa / 대화 或 Gupabal / 구파발。到景福宫站 Gyeongbokgung / 경복궁역，走 5号出口。 | 1,550-1,850 KRW / 7-8 RMB |
+| 09:45-11:15 | 景福宫 Gyeongbokgung / 경복궁 | 从光化门 Gwanghwamun / 광화문 方向进。门票约 3,000 KRW / 13 RMB。早点拍照，人少。 | 3,000 KRW / 13 RMB |
+| 11:15-12:30 | 午饭：土俗村参鸡汤 Tosokchon Samgyetang / 토속촌 삼계탕 | 从景福宫西侧步行过去。主点参鸡汤 samgyetang / 삼계탕。如果排队超过 30 分钟，换附近评分高的汤饭店。 | 20,000-30,000 KRW / 88-132 RMB |
+| 12:30-13:30 | 北村韩屋村 Bukchon Hanok Village / 북촌한옥마을 | 从景福宫/安国一带步行过去。居民区要安静，主要在 Bukchon-ro 11-gil / 북촌로11길 拍照。 | 0 |
+| 13:30-15:00 | 仁寺洞 Insadong / 인사동、Ssamziegil / 쌈지길 | 买传统小礼物：茶、书签、明信片、布袋、文具。 | 20,000-60,000 KRW / 88-264 RMB |
+| 15:00-15:30 | 去明洞 | 从安国站 Anguk / 안국역 坐 3号线 Line 3 / 3호선 到忠武路站 Chungmuro / 충무로역，换 4号线 Line 4 / 4호선 到明洞站 Myeongdong / 명동역，走 6号出口。 | 1,550-1,850 KRW / 7-8 RMB |
+| 15:30-18:30 | 明洞主购物 | 重点去 Olive Young / 올리브영 明洞大店。买护肤、面膜、防晒、手霜。记得带护照说 Tax refund, please。 | 80,000-180,000 KRW / 352-793 RMB |
+| 18:30-19:30 | 晚饭：明洞饺子 Myeongdong Kyoja / 명동교자 | 点刀削面 kalguksu / 칼국수 和饺子 mandu / 만두。第一次去首尔很稳。 | 12,000-20,000 KRW / 53-88 RMB |
+| 19:30-20:15 | 明洞最后小逛 | 只买轻的，不要买太多液体。 | 0-50,000 KRW / 0-220 RMB |
+| 20:15-22:00 | 可选：南山 / N 首尔塔 N Seoul Tower / N서울타워 | 天气好、体力够才去。从明洞站 Myeongdong / 명동역 一带用 Naver Map 搜南山缆车 Namsan Cable Car / 남산 케이블카，步行约 10-15 分钟到缆车下站。坐缆车上山看夜景。只看平台夜景即可；想上观景台再买 N Seoul Tower Observatory 票。 | 缆车往返约 15,000 KRW / 66 RMB；观景台可选约 29,000 KRW / 128 RMB；两项都买约 44,000 KRW / 194 RMB |
+| 22:00-22:45 | 回酒店 | 从南山缆车下站步行回明洞站 Myeongdong / 명동역。坐 4号线 Line 4 / 4호선，方向 Sadang / 사당、Oido / 오이도。到舍堂站 Sadang / 사당역 换 2号线 Line 2 / 2호선，方向 Gangnam / 강남、Seolleung / 선릉。到宣陵站 Seolleung / 선릉역 后步行回酒店。 | 1,550-1,850 KRW / 7-8 RMB |
+| 不去南山时 | 直接回酒店 | 如果下雨、排队长或累了，20:30 左右按上面“明洞 -> 舍堂 -> 宣陵”的地铁路线直接回酒店。 | 1,550-1,850 KRW / 7-8 RMB |
+
+今天礼物清单：
+- 家人：护肤套装、防晒、面膜、密封红参饮/红参膏、茶。
+- 朋友：面膜、小零食、手霜、Kakao Friends / Line Friends 小物。
+- 暗恋对象：今天先看，不急买。看到 30,000-80,000 KRW / 132-352 RMB 的精致手霜/小香可以记下来。
+
+退税：
+- 看到 Tax Free / Tax Refund 就问：Tax refund, please.
+- 小票和护照放一起，不要揉皱。
+
+雨天调整：
+- 雨大就少走北村，多待仁寺洞和明洞室内店。
+- 南山夜景只在不下大雨、云雾不重、排队不夸张时去；否则不要硬上山，早点回酒店更值。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 3 页：7/6 周一，ICML 注册、熟悉 COEX、晚上蚕室
+
+目标：拿胸牌，熟悉会场，确认 7月9 poster 相关位置。
+
+随身：
+- 护照或身份证件
+- ICML 注册确认邮件/二维码
+- 会议 badge 拿到后每天带
+- 水、笔、自带雨伞
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 07:45-08:20 | 早餐 | 酒店附近吃便利店/面包店。顺手买水和咖啡。 | 6,000-12,000 KRW / 26-53 RMB |
+| 08:20-08:35 | 走路去 COEX | 从酒店用 Naver Map 导航到 COEX Convention Center / 코엑스 컨벤션센터。步行约 10-15 分钟。 | 0 |
+| 雨天备用 | 坐地铁去 COEX | 宣陵站 Seolleung / 선릉역 坐 2号线 Line 2 / 2호선 1站到三成站 Samseong / 삼성역，走 5/6号出口，跟 COEX / 코엑스 指示走。 | 1,550 KRW / 7 RMB |
+| 09:00-10:00 | ICML 注册 | 拿胸牌 badge。确认 Wi-Fi、会议 App、help desk。 | 0 |
+| 10:00-10:45 | 熟悉会场 | 找 Hall A、poster 区、Hall B2 East Gate、洗手间、咖啡点、安静座位。把会场地图拍下来。 | 0 |
+| 10:45-12:30 | Tutorial / Expo / session | 按兴趣听。第一天别太累。 | 0 |
+| 12:30-13:30 | 午饭 | 推荐 COEX 河东馆 Hadongkwan / 하동관，或 COEX 美食广场。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:30-17:30 | ICML 下午 | 听 tutorial/expo。记下 7月9 poster 前想交流的人。 | 0 |
+| 17:30-18:00 | 回酒店休息 | 走路回去，放会议包。 | 0 |
+| 18:00-18:25 | 去蚕室 Jamsil / 잠실 | 从三成站 Samseong / 삼성역 坐 2号线 Line 2 / 2호선，方向 Jamsil / 잠실。到蚕室站 Jamsil / 잠실역，跟 Lotte World Mall / 롯데월드몰 指示走；常用 Exit 1/2/11 一带。 | 1,550 KRW / 7 RMB |
+| 18:30-20:30 | 乐天世界塔/商场 | 逛 Lotte World Mall / 롯데월드몰。天气好再考虑 Seoul Sky。晚饭在商场里解决。 | 晚饭 18,000-35,000 KRW / 79-154 RMB |
+| 20:30-21:00 | 回酒店 | 蚕室站 Jamsil / 잠실역 坐 2号线回宣陵站 Seolleung / 선릉역。 | 1,550 KRW / 7 RMB |
+
+今天购物：
+- 只在 COEX 轻买：文具、小零食、水。
+- 不要带很多东西进会场。
+
+会议任务：
+- 确认 poster 取件邮件。
+- 确认 7月9 上午具体板位和时间。
+
+如果累：
+- 晚上不要去蚕室，直接 COEX 吃饭回酒店。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 4 页：7/7 周二，ICML、圣水洞、纛岛汉江公园可选
+
+目标：上午会议，下午去圣水洞喝咖啡、逛小店；天气好时顺路补一个汉江夜景。今天不去 T1 江南店，把 T1 体验集中到 7月8日弘大 T1 BASE CAMP。
+
+随身：
+- 会议 badge
+- 护照：购物退税用
+- 自带雨伞：看天气决定要不要带
+- 轻便购物袋
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:00-08:30 | 早餐 | 酒店附近解决。 | 6,000-12,000 KRW / 26-53 RMB |
+| 08:30-12:30 | ICML 上午 | 步行去 COEX。听重点 session。 | 0 |
+| 12:30-13:30 | 午饭 | COEX Mall 简单吃饭。建议汤饭/盖饭，不要太撑。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:30-14:15 | 回酒店休息 | 从 COEX 步行回酒店，放会议资料。下午只带轻便包出门。 | 0 |
+| 14:15-14:45 | 去圣水洞 Seongsu / 성수 | 从宣陵站 Seolleung / 선릉역 坐 2号线 Line 2 / 2호선，方向 Jamsil / 잠실、Wangsimni / 왕십리、Seongsu / 성수。到圣水站 Seongsu / 성수역，去 Cafe Onion 优先走 2号出口 Exit 2。 | 1,550-1,850 KRW / 7-8 RMB |
+| 14:50-16:10 | Cafe Onion 圣水 | Cafe Onion / 어니언 很有名，但可能排队。排队太长就换旁边咖啡店。 | 8,000-15,000 KRW / 35-66 RMB |
+| 16:10-18:00 | 圣水洞逛小店 | 买设计小物、咖啡豆、明信片、文具。 | 0-60,000 KRW / 0-264 RMB |
+| 18:00-19:00 | 晚饭 | 推荐圣水土豆汤 Somunnan Seongsu Gamjatang / 소문난성수감자탕；排队太久就找附近评分高的汤饭/面店。 | 15,000-30,000 KRW / 66-132 RMB |
+| 19:00-19:35 | 可选：步行去纛岛汉江公园 Ttukseom Hangang Park / 뚝섬한강공원 | 天气好、体力够才去。从圣水土豆汤附近用 Naver Map 搜 뚝섬한강공원，步行到汉江边。 | 0 |
+| 19:35-20:15 | 汉江夜坐 | 在江边坐 30-45 分钟，拍照、买饮料。不要拖太晚，7/8 是 T1，7/9 是 poster。 | 饮料/零食 3,000-8,000 KRW / 13-35 RMB |
+| 20:15-21:00 | 从汉江回酒店 | 去纛岛游园地站 Ttukseom Resort / 뚝섬유원지역 坐 7号线 Line 7 / 7호선，1站到建大入口站 Konkuk Univ. / 건대입구역。换 2号线 Line 2 / 2호선，方向 Jamsil / 잠실、Samseong / 삼성、Seolleung / 선릉。到宣陵站 Seolleung / 선릉역。 | 1,550-1,850 KRW / 7-8 RMB |
+| 不去汉江时 | 圣水直接回酒店 | 如果下雨、太累、鞋子不舒服，就从圣水站 Seongsu / 성수역 坐 2号线回宣陵站。 | 1,550-1,850 KRW / 7-8 RMB |
+
+今天买什么：
+- 圣水洞：小设计礼物、咖啡、文具，适合朋友。
+- T1 不在今天买，7月8日去弘大 T1 BASE CAMP 一次性买周边、拍照、打游戏。
+
+暗恋对象：
+- 圣水可能有不错小物，但主礼物建议留到 7/9 狎鸥亭/Tamburins。
+
+体力规则：
+- 去汉江的话 21:00 左右到酒店；不去汉江就 20:00 前后回酒店。7/8 是 T1 主日，7/9 是 poster 日，不要在汉江拖到太晚。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 5 页：7/8 周三，弘大 T1 BASE CAMP、买周边、打游戏
+
+目标：T1 主体验日，买周边、拍照、打游戏，但晚上必须早点回去。
+
+随身：
+- 护照或身份证件
+- 银行卡
+- T-money
+- 充电宝
+- 购物袋
+- 游戏账号密码。韩服 LoL 可能需要韩国账号/认证，现场问工作人员哪些游戏游客能玩。
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:00-12:00 | ICML 上午或休息 | 重要 session 就去；如果累就休息。下午留给 T1。 | 0 |
+| 12:00-13:00 | 午饭 | 酒店/COEX 附近吃。不要饿着去弘大。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:45 | 出发去弘大 | 步行到宣陵站 Seolleung / 선릉역。 | 0 |
+| 14:00-14:55 | 2号线直达弘大 | 宣陵站 Seolleung / 선릉역 坐 2号线 Line 2 / 2호선。方向看 Gangnam / 강남、Sadang / 사당、Hapjeong / 합정、Hongik Univ. / 홍대입구。到弘大入口站 Hongik Univ. / 홍대입구역。 | 1,550-1,850 KRW / 7-8 RMB |
+| 14:55-15:05 | 走到 T1 BASE CAMP | 到弘大入口站后打开 Naver Map 搜 T1 BASE CAMP / T1 베이스캠프 或地址 147 Yanghwa-ro / 양화로 147。首选按导航出口走；147 Yanghwa-ro 离 Exit 1/Exit 11 都不远。目标是 B1 地下 1 层，不要只看地面招牌。 | 0 |
+| 15:05-16:00 | 买 T1 周边、拍照 | 先买东西再打游戏。PC 房 24小时，但店铺/库存更重要。 | 60,000-180,000 KRW / 264-793 RMB |
+| 16:00-18:30 | 打游戏 | 非会员价格参考约 3,000 KRW/小时 / 13 RMB/小时。打 2-3 小时够了。 | 7,500-9,000 KRW / 33-40 RMB |
+| 18:30-19:30 | 弘大晚饭 | 推荐 Myth Jokbal / 미쓰족발 弘大店，吃猪蹄。一个人想简单点就吃春川辣炒鸡 dakgalbi / 닭갈비、紫菜包饭、面店。 | 18,000-35,000 KRW / 79-154 RMB |
+| 19:30-20:30 | 弘大/延南洞轻逛 | 买小东西即可，不要买很多液体。 | 0-50,000 KRW / 0-220 RMB |
+| 20:30-21:25 | 回酒店 | 弘大入口站 Hongik Univ. / 홍대입구역 坐 2号线回宣陵站 Seolleung / 선릉역。 | 1,550-1,850 KRW / 7-8 RMB |
+| 21:30-22:00 | 准备 poster | 确认 7/9 poster 邮件、胸牌、衣服、照片设备。早点睡。 | 0 |
+
+今天买什么：
+- 自己：队服、帽子、鼠标垫、徽章、钥匙扣、亚克力立牌。
+- 朋友：钥匙扣、徽章、小卡、贴纸。
+- 暗恋对象：只有对方喜欢 T1/LoL 才买 T1 礼物，否则不要把 T1 当主礼物。
+
+预算：
+- 低配：40,000 KRW / 176 RMB。
+- 正常：100,000-250,000 KRW / 441-1,101 RMB。
+- 买队服/大件：250,000 KRW+ / 1,101 RMB+。
+
+硬性规则：
+- 21:00 左右必须准备回程。7/9 poster 比多打一局重要。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 6 页：7/9 周四，Poster 日、COEX、狎鸥亭罗德奥买精致礼物
+
+目标：poster 表现第一，照片拍好。下午只安排轻松、精致购物。
+
+随身：
+- 会议 badge
+- poster 取件确认邮件
+- 手机满电
+- 适合拍照但舒服的衣服
+- 护照：下午购物退税用
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 07:30-08:00 | 早餐 | 酒店附近吃。不要吃太辣太油。 | 6,000-12,000 KRW / 26-53 RMB |
+| 08:15-08:30 | 去 COEX | 走路去 COEX。雨大就宣陵站 Seolleung / 선릉역 坐 2号线 1站到三成站 Samseong / 삼성역，5/6号出口。 | 0 或 1,550 KRW / 7 RMB |
+| 09:00 | 取 poster | 如果用了 ICML 官方打印，去 Hall B2 East Gate 附近，带确认邮件。如果 poster 已在手，直接去 Hall A。 | 0 |
+| 09:15-09:30 | 贴 poster | 找板位，贴平，先拍一张空场照片。 | 0 |
+| 09:30-10:15 | 最后准备 | 准备 30秒版、2分钟版讲解。喝水。 | 0 |
+| 10:30-12:15 | poster session | 讲 poster、答疑、交换联系方式。 | 0 |
+| 12:15-12:45 | 拍照收尾 | 拍 poster、你和 poster、badge、会场照片。发朋友圈注意遮住二维码/个人信息。 | 0 |
+| 12:45-13:45 | 午饭 | COEX 附近吃汤饭、盖饭、面。不要排长队。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:45-15:00 | 回酒店休息 | 放 poster、备份照片到云端。 | 0 |
+| 15:00-15:25 | 去狎鸥亭罗德奥 | 宣陵站 Seolleung / 선릉역 坐水仁盆唐线 Suin-Bundang Line / 수인분당선，方向 Wangsimni / 왕십리 或 Cheongnyangni / 청량리。到狎鸥亭罗德奥站 Apgujeong Rodeo / 압구정로데오역，去 Haus Dosan / Tamburins / Gentle Monster 优先走 5号出口 Exit 5。 | 1,550-1,850 KRW / 7-8 RMB |
+| 15:30-17:30 | Haus Dosan / Tamburins / Gentle Monster | 这里适合买暗恋对象礼物。Tamburins / 탬버린즈 的护手霜、香膏比直接买贵香水更稳。Gentle Monster / 젠틀몬스터 适合拍照，除非真要买墨镜。 | 30,000-100,000 KRW / 132-441 RMB |
+| 17:30-18:30 | 咖啡/晚饭 | 不饿就喝咖啡甜品；饿就用 Naver Map 找附近韩餐。 | 10,000-30,000 KRW / 44-132 RMB |
+| 18:30-19:15 | 回酒店 | 狎鸥亭罗德奥站 Apgujeong Rodeo / 압구정로데오역 坐水仁盆唐线回宣陵站 Seolleung / 선릉역。 | 1,550-1,850 KRW / 7-8 RMB |
+| 19:30-20:30 | 可选 ICML 社交 | 有精力就回 COEX；没精力就休息。 | 0 |
+
+暗恋对象礼物建议：
+- 最稳：Tamburins 护手霜/香膏，30,000-50,000 KRW / 132-220 RMB。
+- 稍微认真：小香，60,000-100,000 KRW / 264-441 RMB。
+- 不建议：戒指、情侣款、很贵的正装香水。
+
+今天不买：
+- 不买一堆大件。
+- 不买太多同款护肤品。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 7 页：7/10 周五，LoL Park、广藏市场、DDP/明洞补买
+
+目标：不离开首尔的电竞日，顺便吃市场小吃、补买漏掉的礼物。
+
+随身：
+- 护照：退税用
+- T-money
+- 购物袋
+- 自带雨伞
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:00-10:30 | ICML workshop 或慢起 | 有相关 workshop 就去；如果 7/9 累了就晚点出门。 | 0 |
+| 10:45 | 出发去 LoL Park | 宣陵站 Seolleung / 선릉역 坐 2号线 Line 2 / 2호선，方向 Samseong / 삼성、Jamsil / 잠실、Wangsimni / 왕십리、City Hall / 시청。到市厅站 City Hall / 시청역 换 1号线 Line 1 / 1호선，坐 1站到钟阁站 Jonggak / 종각역，走 1号出口 Exit 1。然后去 Gran Seoul / 그랑서울 3F，地址 33 Jong-ro / 종로 33。 | 1,550-1,850 KRW / 7-8 RMB |
+| 11:30-13:00 | LoL Park / 롤파크 | 逛 Riot Store、LCK/Riot 展示、拍照。 | 0-80,000 KRW / 0-352 RMB |
+| 13:00-14:00 | 午饭 | 方案 A：Gran Seoul 附近吃。方案 B：直接去广藏市场吃。 | 12,000-25,000 KRW / 53-110 RMB |
+| 14:00-14:15 | 去广藏市场 | 从钟阁站 Jonggak / 종각역 坐 1号线 Line 1 / 1호선，方向 Dongdaemun / 동대문、Cheongnyangni / 청량리。坐 2站到钟路5街站 Jongno 5-ga / 종로5가역，走 8号出口 Exit 8。 | 地铁 1,550 KRW / 7 RMB |
+| 14:15-16:00 | 广藏市场 Gwangjang Market / 광장시장 | 吃绿豆煎饼 bindaetteok / 빈대떡、迷你紫菜包饭 mayak gimbap / 마약김밥、辣炒年糕 tteokbokki / 떡볶이。现金更方便。 | 15,000-30,000 KRW / 66-132 RMB |
+| 16:00-16:25 | 去 DDP | 从广藏市场 Gwangjang Market / 광장시장 用 Naver Map 步行到 DDP 东大门设计广场 / 동대문디자인플라자，约 15-25 分钟。 | 步行 0 |
+| 16:20-18:00 | DDP 东大门设计广场 / 동대문디자인플라자 | 拍照，逛设计小店。雨天尽量待室内。 | 0-50,000 KRW / 0-220 RMB |
+| 18:00-19:30 | 可选明洞补买 | 东大门历史文化公园站 Dongdaemun History & Culture Park / 동대문역사문화공원역 坐 4号线 Line 4 / 4호선 到明洞站 Myeongdong / 명동역，6/8号出口。只买漏掉的。 | 地铁 1,550 KRW / 7 RMB；购物 0-80,000 KRW / 0-352 RMB |
+| 19:30-20:15 | 回酒店 | 明洞站 Myeongdong / 명동역 坐 4号线 Line 4 / 4호선，方向 Sadang / 사당、Oido / 오이도。到舍堂站 Sadang / 사당역 换 2号线 Line 2 / 2호선，方向 Gangnam / 강남、Seolleung / 선릉。到宣陵站 Seolleung / 선릉역。 | 1,550-1,850 KRW / 7-8 RMB |
+
+今天买什么：
+- LoL Park：Riot/LoL 笔记本、徽章、手办、小周边。
+- 广藏市场：可以吃，不建议买油腻开封食物带回国。
+- DDP：设计小物，适合朋友。
+
+雨天调整：
+- 如果雨很大，做 LoL Park + 明洞/商场，跳过 DDP 外景。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 8 页：7/11 周六，ICML workshop、最后购物、收行李
+
+目标：会议收尾，礼物补齐，晚上把行李和退税材料整理好。
+
+随身：
+- 护照
+- 小票/退税单文件袋
+- 购物清单
+- 空购物袋
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:00-09:00 | 早餐 + 检查行李空间 | 先看箱子还能装多少，再决定最后买多少。 | 6,000-12,000 KRW / 26-53 RMB |
+| 09:00-12:30 | ICML workshop | 走路到 COEX。只听最相关的 workshop。 | 0 |
+| 12:30-13:30 | 午饭 | COEX 简单吃。不要排特别长的队。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:30-15:00 | COEX 最后购物 | 买密封零食、小礼物、漏掉的护肤品。COEX 离酒店近，最安全。 | 50,000-150,000 KRW / 220-661 RMB |
+| 15:00-15:30 | 回酒店放东西 | 步行回酒店。按收礼人分袋。 | 0 |
+| 15:30-17:30 | 可选江南站购物 | 宣陵站 Seolleung / 선릉역 坐 2号线 Line 2 / 2호선 到江南站 Gangnam / 강남역，2站。走 10/11号出口，逛江南商圈和地下街。 | 1,550-1,850 KRW / 7-8 RMB |
+| 17:30-18:30 | 最后一顿晚饭 | 建议在江南/宣陵附近吃，不要跑远。韩式烤肉、汤饭、面都可以。 | 18,000-40,000 KRW / 79-176 RMB |
+| 18:30-20:30 | 收行李 | 分成托运行李、随身包、退税商品、小票、护照。充电宝必须随身。 | 0 |
+| 20:30-21:00 | 确认退房和机场路线 | 确认 7/12 11:00 退房、酒店是否能寄存行李、航站楼、21:30 航班/离开时间、6103 机场巴士上车点。 | 0 |
+| 21:00-22:30 | 休息 | 洗澡，充电，第二天白天随身包单独放好。 | 0 |
+
+最后礼物清单：
+- 家人：护肤套装、红参/茶、咖啡、密封零食。每个亲近家人至少一个明确礼物。
+- 朋友：T1/Riot 小周边、零食、面膜。
+- 暗恋对象：一个主礼物即可，包装保持干净。
+
+行李规则：
+- 充电宝、笔记本电脑、锂电池：随身。
+- 超过 100ml 液体：托运。
+- 退税商品：机场退税前尽量保持可检查状态。
+- 食品：只带密封商业包装。
+- 小票：统一放一个信封/文件袋。
+
+预算控制：
+- 最后购物很容易超支。出门前设一个上限，例如 250,000 KRW / 1,101 RMB。
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## 第 9 页：7/12 周日，11:00 退房、白天轻松收尾、晚上飞长沙
+
+目标：11:00 前退房并寄存行李，白天只安排轻松近距离活动，晚上 21:30 从仁川机场出发/起飞。
+
+随身：
+- 护照
+- 登机牌/航空公司 App
+- 银行卡、现金
+- 手机、充电线
+- 充电宝：随身，不托运
+- 退税小票和退税商品
+- 白天小包：不要把所有东西都背出去，重行李寄存在酒店
+
+| 时间 | 做什么 | 具体怎么走 | 费用 |
+|---|---|---|---:|
+| 08:30-09:30 | 起床、早餐 | 酒店附近吃早餐。检查箱子重量、液体、充电宝、小票。 | 8,000-15,000 KRW / 35-66 RMB |
+| 09:30-10:30 | 最后整理 | 把托运行李、随身包、退税商品分开。检查床下、浴室、插座。 | 0 |
+| 10:30-11:00 | 退房、寄存行李 | 11:00 前到前台退房。把大行李寄存在酒店，拿行李牌/拍照记录。韩语可说：짐 보관 가능할까요? / 能寄存行李吗？ | 0 |
+| 11:00-12:30 | COEX 轻松午前活动 | 从酒店步行去 COEX Mall / 코엑스몰 或 Starfield Library / 별마당도서관。今天只适合轻松逛，不要再买重东西。 | 0-20,000 KRW / 0-88 RMB |
+| 12:30-13:30 | 午饭 | COEX 或酒店附近吃。建议汤饭/盖饭，别吃太撑。 | 15,000-25,000 KRW / 66-110 RMB |
+| 13:30-15:30 | 最后轻量补买 | 只买小件：零食、贴纸、明信片、轻便小礼物。不要买大瓶液体。 | 0-80,000 KRW / 0-352 RMB |
+| 15:30-16:30 | 回酒店取行李前休息 | 回酒店附近咖啡店坐一会儿，整理小票和护照。 | 5,000-12,000 KRW / 22-53 RMB |
+| 16:20-17:00 | 取行李、步行去机场巴士站 | 回酒店取行李。步行到 COEX City Airport Terminal / 도심공항터미널 附近 6103 站点；拖行李就提前 10-15 分钟出发。 | 步行 0 |
+| 17:00-17:30 | 坐 6103 机场巴士 | 坐 6103，方向仁川机场 Incheon Airport / 인천공항。上车前确认你的航站楼 T1/T2。 | 18,000 KRW / 79 RMB |
+| 18:15-19:00 | 到仁川机场 | COEX 到 T1 约 65 分钟，到 T2 约 85 分钟，实际看交通。目标 19:00 前到机场。 | 已含 |
+| 19:00-19:45 | 值机、托运行李 | 如果退税商品需要查验，先查验再托运。充电宝、电脑随身。 | 0 |
+| 19:45-20:30 | 安检、出境、退税 | 退税机/柜台准备护照和小票。 | 0 |
+| 20:30-21:00 | 登机口附近 | 吃点东西/买水。不要开始大购物。 | 8,000-20,000 KRW / 35-88 RMB |
+| 21:30 | 飞长沙/离开仁川 | 提前到登机口。 | 0 |
+
+如果 6103 时间不稳：
+- 如果 6103 临时不稳：立刻用 Naver Map 查“COEX -> Incheon Airport / 인천공항”的地铁 + AREX 组合路线，按 2.5 小时预留，不再临时改成打车。
+- 晚航班也不要卡点，因为退税、托运、安检都可能排队。
+
+离开酒店前最后确认：
+- 护照
+- 钱包和银行卡
+- 手机
+- 充电线
+- 充电宝
+- 笔记本电脑
+- poster 照片已备份
+- 礼物
+- 小票
+- 房卡已归还，寄存行李已取回
+
+---
+
+## 参考来源
+
+- ICML 2026：https://icml.cc/
+- ICML poster instructions：https://icml.cc/Conferences/2026/PosterInstructions
+- 6103 机场巴士：https://www.calt.co.kr/m/EN/limousine/04.php
+- T1 BASE CAMP：https://english.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=194959
+- T1 江南店：https://english.visitkorea.or.kr/svc/whereToGo/locIntrdn/rgnContentsView.do?vcontsId=215342
+- LoL Park：https://english.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=191106
+- 韩国退税说明：https://english.visitseoul.net/taxrefund
+- 禁止携带进境动植物产品参考：https://xmsyj.moa.gov.cn/gjjlhz/202111/t20211102_6381054.htm
+</script>
+  <script>
+    const sourceMarkdown = document.getElementById("sourceMarkdown").textContent;
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function inline(text) {
+      let value = escapeHtml(text);
+      value = value.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+      value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
+      return value;
+    }
+
+    function splitTableRow(row) {
+      const trimmed = row.trim().replace(/^\|/, "").replace(/\|$/, "");
+      return trimmed.split("|").map(cell => cell.trim());
+    }
+
+    function isSeparator(row) {
+      return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(row);
+    }
+
+    function renderMarkdown(md) {
+      const lines = md.replace(/\r\n/g, "\n").split("\n");
+      const out = [];
+      let paragraph = [];
+      let list = [];
+
+      function flushParagraph() {
+        if (!paragraph.length) return;
+        out.push("<p>" + inline(paragraph.join(" ")) + "</p>");
+        paragraph = [];
+      }
+
+      function flushList() {
+        if (!list.length) return;
+        out.push("<ul>" + list.map(item => "<li>" + inline(item) + "</li>").join("") + "</ul>");
+        list = [];
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          flushParagraph();
+          flushList();
+          continue;
+        }
+
+        if (trimmed === "---") {
+          flushParagraph();
+          flushList();
+          out.push("<hr>");
+          continue;
+        }
+
+        if (/^<div\s+style=/.test(trimmed)) {
+          flushParagraph();
+          flushList();
+          continue;
+        }
+
+        const heading = trimmed.match(/^(#{1,3})\s+(.*)$/);
+        if (heading) {
+          flushParagraph();
+          flushList();
+          const level = heading[1].length;
+          out.push("<h" + level + ">" + inline(heading[2]) + "</h" + level + ">");
+          continue;
+        }
+
+        if (/^\|/.test(trimmed) && i + 1 < lines.length && isSeparator(lines[i + 1])) {
+          flushParagraph();
+          flushList();
+          const headers = splitTableRow(trimmed);
+          i += 2;
+          const rows = [];
+          while (i < lines.length && /^\|/.test(lines[i].trim())) {
+            rows.push(splitTableRow(lines[i]));
+            i++;
+          }
+          i--;
+          let table = '<div class="table-wrap"><table><thead><tr>';
+          table += headers.map(h => "<th>" + inline(h) + "</th>").join("");
+          table += "</tr></thead><tbody>";
+          for (const row of rows) {
+            table += "<tr>";
+            for (let c = 0; c < headers.length; c++) {
+              table += "<td>" + inline(row[c] || "") + "</td>";
+            }
+            table += "</tr>";
+          }
+          table += "</tbody></table></div>";
+          out.push(table);
+          continue;
+        }
+
+        const listItem = trimmed.match(/^-\s+(.*)$/);
+        if (listItem) {
+          flushParagraph();
+          list.push(listItem[1]);
+          continue;
+        }
+
+        flushList();
+        paragraph.push(trimmed);
+      }
+
+      flushParagraph();
+      flushList();
+      return out.join("\n");
+    }
+
+    function getTitle(md, fallback) {
+      const match = md.match(/^##\s+(.+)$/m) || md.match(/^#\s+(.+)$/m);
+      return match ? match[1].trim() : fallback;
+    }
+
+    const rawPages = sourceMarkdown
+      .split(/<div style="page-break-after:\s*always;"><\/div>/)
+      .map(part => part.trim())
+      .filter(Boolean);
+
+    const pages = rawPages.map((md, index) => ({
+      index,
+      title: index === 0 ? "总览与准备事项" : getTitle(md, "页面 " + (index + 1)),
+      html: renderMarkdown(md)
+    }));
+
+    const pagesEl = document.getElementById("pages");
+    const tocEl = document.getElementById("toc");
+    const selectEl = document.getElementById("pageSelect");
+    const pageTitleEl = document.getElementById("pageTitle");
+    const pageCounterEl = document.getElementById("pageCounter");
+    const firstBtn = document.getElementById("firstBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const lastBtn = document.getElementById("lastBtn");
+    const printBtn = document.getElementById("printBtn");
+
+    pagesEl.innerHTML = pages.map((page, index) => (
+      '<article class="page" id="page-' + index + '" aria-label="' + escapeHtml(page.title) + '">' +
+      page.html +
+      '<div class="page-footer"><span>第 ' + (index + 1) + ' / ' + pages.length + ' 页</span><span>首尔 ICML 行程单</span></div>' +
+      '</article>'
+    )).join("");
+
+    tocEl.innerHTML = pages.map((page, index) => (
+      '<button type="button" data-page="' + index + '">' +
+      '<span class="page-index">第 ' + (index + 1) + ' 页</span>' +
+      escapeHtml(page.title) +
+      '</button>'
+    )).join("");
+
+    selectEl.innerHTML = pages.map((page, index) => (
+      '<option value="' + index + '">第 ' + (index + 1) + ' 页 - ' + escapeHtml(page.title) + '</option>'
+    )).join("");
+
+    let current = Number(new URLSearchParams(location.search).get("page")) - 1;
+    if (!Number.isInteger(current) || current < 0 || current >= pages.length) current = 0;
+
+    function showPage(index, updateHash = true) {
+      current = Math.max(0, Math.min(index, pages.length - 1));
+      document.querySelectorAll(".page").forEach((el, i) => {
+        el.classList.toggle("active", i === current);
+        if (i === current) el.scrollTop = 0;
+      });
+      document.querySelectorAll(".toc button").forEach((btn, i) => {
+        btn.classList.toggle("active", i === current);
+      });
+      selectEl.value = String(current);
+      pageTitleEl.textContent = pages[current].title;
+      pageCounterEl.textContent = "第 " + (current + 1) + " / " + pages.length + " 页";
+      prevBtn.disabled = current === 0;
+      firstBtn.disabled = current === 0;
+      nextBtn.disabled = current === pages.length - 1;
+      lastBtn.disabled = current === pages.length - 1;
+      if (updateHash) {
+        const url = new URL(location.href);
+        url.searchParams.set("page", String(current + 1));
+        history.replaceState(null, "", url);
+      }
+    }
+
+    tocEl.addEventListener("click", event => {
+      const btn = event.target.closest("button[data-page]");
+      if (btn) showPage(Number(btn.dataset.page));
+    });
+
+    selectEl.addEventListener("change", () => showPage(Number(selectEl.value)));
+    firstBtn.addEventListener("click", () => showPage(0));
+    prevBtn.addEventListener("click", () => showPage(current - 1));
+    nextBtn.addEventListener("click", () => showPage(current + 1));
+    lastBtn.addEventListener("click", () => showPage(pages.length - 1));
+    printBtn.addEventListener("click", () => window.print());
+
+    window.addEventListener("keydown", event => {
+      if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
+      if (event.key === "ArrowLeft") showPage(current - 1);
+      if (event.key === "ArrowRight") showPage(current + 1);
+      if (event.key === "Home") showPage(0);
+      if (event.key === "End") showPage(pages.length - 1);
+    });
+
+    showPage(current, false);
+  </script>
+</body>
+</html>
