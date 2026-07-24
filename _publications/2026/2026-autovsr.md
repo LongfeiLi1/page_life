@@ -13,6 +13,6 @@ authors:
   - Zixing Zhang
   - Mingyu Liu
 links:
-  Paper: https://icml.cc/virtual/2026/poster/66479
+  Paper: https://arxiv.org/abs/2607.11338
   Code: https://github.com/LongfeiLi1/AutoVSR
 ---
