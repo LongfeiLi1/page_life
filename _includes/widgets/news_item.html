@@ -1,0 +1,12 @@
+{%- assign item = include.item -%}
+<li class="news-item">
+    <span class="news-date">{{ item.date | date: "%b. %Y" }}</span>
+    <span class="news-text">
+        {{ item.title }}
+        {% if item.certificate %}
+        <a class="cert-badge" {% if item.certificate_type == "pdf" %}href="{{ item.certificate | relative_url }}" target="_blank" rel="noopener noreferrer"{% else %}data-cert="{{ item.certificate | relative_url }}" href="{{ item.certificate | relative_url }}"{% endif %}>
+            <i class="fas fa-award fa-xs"></i>&nbsp;Cert.
+        </a>
+        {% endif %}
+    </span>
+</li>
