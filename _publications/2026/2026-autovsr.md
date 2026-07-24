@@ -4,7 +4,7 @@ date:           2026-05-01 00:00:00 +0800
 selected:       true
 pub:            "International Conference on Machine Learning (ICML)"
 pub_date:       "2026"
-cover:          /assets/autovsr_show_v4.png
+cover:          /assets/autovsr_perf_show.png
 authors:
   - Zhe Xiao*
   - Longfei Li*
