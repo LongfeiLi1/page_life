@@ -10,6 +10,8 @@ email: "kurobalt26@gmail.com"
 github: LongfeiLi1
 orcid: 0009-0003-6447-8345
 cv: /assets/pdfs/cv_202607.pdf
+wechat_qrcode: /assets/images/wechat_qrcode.jpg
+wechat_prompt: "扫码添加微信（请备注来意，谢谢）"
 
 
 short_bio_text_justify: false
