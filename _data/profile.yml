@@ -10,7 +10,7 @@ email: "kurobalt26@gmail.com"
 github: LongfeiLi1
 orcid: 0009-0003-6447-8345
 cv: /assets/pdfs/cv_202607.pdf
-wechat_qrcode: /assets/images/wechat_qrcode.jpg
+wechat_qrcode: /assets/images/wechat_qrcode_v2.jpg
 wechat_prompt: "Scan the QR code to connect on WeChat. Please state your reason for connecting, thank you!"
 
 
@@ -27,7 +27,7 @@ short_bio: >-
       Outside of research, I enjoy landscape and street photography, and cycling. I love cat vvvvvvvvvvvery much! Hah😃.
   </p>
 
-portrait_url: /assets/profile.png
+portrait_url: /assets/profile_v2.png
 portrait_caption: ""
 
 education:
