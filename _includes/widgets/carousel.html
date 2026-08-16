@@ -8,7 +8,7 @@
         <div class="carousel-inner" style="height: {{ include.height }};">
             {% for item in include.images %}
             <div class="carousel-item {% if forloop.index == 1 %}active{% endif %}">
-                {% if item.link %}<a href="{{ item.link }}" target="_blank">{% endif %}
+                {% if item.link %}<a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">{% endif %}
                 <div class="lazy always-load d-block rounded-xl" data-src="{{ item.src | relative_url }}" style="height: {{ include.height }};">
                 </div>
                 <div class="carousel-caption d-none d-md-block">
