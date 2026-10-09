@@ -1,0 +1,822 @@
+---
+layout: default
+title: "Reunited with the girl I loved at 17!"
+navbar_title: "Memory"
+---
+
+<style>
+  /* 页面基础容器 */
+  .memory-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 4rem;
+  }
+
+  /* 顶部标签 */
+  .badge-memory {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #fecdd3;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.85rem;
+  }
+
+  .memory-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+  }
+
+  .memory-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 576px) {
+    .memory-title {
+      font-size: 1.65rem;
+    }
+    .memory-subtitle {
+      font-size: 0.95rem;
+    }
+  }
+
+  .memory-date {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* 文字编辑留白区 */
+  .memory-story-box {
+    max-width: 680px;
+    margin: 1.5rem auto 2.2rem;
+    padding: 0 1rem;
+    line-height: 1.8;
+    color: #475569;
+    font-size: 1.02rem;
+  }
+
+  /* ================= 方案 1: 水平电影胶卷画卷 (Filmstrip Reel) ================= */
+  .film-reel-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .film-reel-track {
+    display: flex;
+    gap: 1.6rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 1.2rem 1.5rem 1.8rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  /* 自定义优雅滚动条 */
+  .film-reel-track::-webkit-scrollbar {
+    height: 7px;
+  }
+  .film-reel-track::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 9999px;
+  }
+  .film-reel-track::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  .film-reel-track::-webkit-scrollbar-thumb:hover {
+    background: #f43f5e;
+  }
+
+  /* 胶卷卡片样式 (长图原画满高展示，卡片宽度紧贴长图边缘，零留白) */
+  .film-strip-card {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    height: 570px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 8px 8px 10px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eef2f6;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+
+  @media (max-width: 768px) {
+    .film-strip-card {
+      height: 480px;
+      padding: 7px 7px 9px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .film-strip-card {
+      height: 390px;
+      padding: 6px 6px 8px;
+      border-radius: 11px;
+    }
+  }
+
+  .film-strip-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 16px 36px rgba(225, 29, 72, 0.16), 0 2px 6px rgba(0, 0, 0, 0.06);
+    border-color: #fecdd3;
+  }
+
+  .strip-media-wrap {
+    height: calc(100% - 30px);
+    width: auto;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .strip-img {
+    height: 100%;
+    width: auto;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .strip-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .film-strip-card.playing .strip-video {
+    opacity: 1;
+  }
+
+  /* iOS 风格 LIVE 徽标 */
+  .live-pill {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .live-pill .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fb7185;
+    box-shadow: 0 0 6px #f43f5e;
+  }
+
+  .film-strip-card.playing .live-pill {
+    background: rgba(225, 29, 72, 0.9);
+  }
+
+  .strip-card-foot {
+    height: 22px;
+    margin-top: 8px;
+    width: 100%;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  /* 浮动翻页导航按钮 */
+  .reel-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    color: #334155;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+  }
+
+  .reel-nav-btn:hover {
+    background: #ffffff;
+    color: #e11d48;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 24px rgba(225, 29, 72, 0.2);
+  }
+
+  .reel-prev { left: 4px; }
+  .reel-next { right: 4px; }
+
+  @media (max-width: 768px) {
+    .reel-nav-btn {
+      display: none; /* 移动端靠丝滑手指横滑 */
+    }
+  }
+
+  .reel-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: -0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* 优雅爱心分隔线 */
+  .memory-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    margin: 3.5rem 0 2.5rem;
+  }
+
+  .divider-line {
+    flex: 1;
+    max-width: 160px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
+  }
+
+  .divider-icon {
+    font-size: 1.15rem;
+    color: #f43f5e;
+    animation: heartPulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  /* 压轴单照单独展示 */
+  .memory-final-container {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .final-photo-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 12px 12px 16px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eef2f6;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .final-photo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(225, 29, 72, 0.18);
+    border-color: #fecdd3;
+  }
+
+  .final-media-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+  .final-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
+
+  .final-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .final-photo-card.playing .final-video {
+    opacity: 1;
+  }
+
+  .final-foot {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.1em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* 全屏大图相册 Lightbox */
+  .memory-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .memory-lightbox.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .lightbox-content-box {
+    position: relative;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-media-holder {
+    position: relative;
+    max-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-img,
+  .lightbox-video {
+    max-width: 90vw;
+    max-height: 80vh;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    object-fit: contain;
+  }
+
+  .lightbox-video {
+    display: none;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+  }
+
+  .lightbox-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .lightbox-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .lightbox-prev { left: 24px; }
+  .lightbox-next { right: 24px; }
+
+  @media (max-width: 576px) {
+    .lightbox-prev { left: 10px; width: 38px; height: 38px; }
+    .lightbox-next { right: 10px; width: 38px; height: 38px; }
+  }
+
+  .lightbox-bottom-bar {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+  }
+
+  .lightbox-counter {
+    font-family: monospace;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 10px;
+    border-radius: 20px;
+    color: #fff;
+  }
+
+  .lightbox-live-toggle {
+    display: none;
+    background: #e11d48;
+    color: white;
+    border: none;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    align-items: center;
+    gap: 5px;
+  }
+</style>
+
+<div class="memory-container">
+  
+  <!-- 顶部标题区 -->
+  <div class="text-center mb-4">
+    <div class="badge-memory">
+      <i class="fas fa-heart"></i> Memory
+    </div>
+    <h1 class="memory-title">Reunited with the girl I loved at 17!</h1>
+    <div class="memory-subtitle">我追回了17岁喜欢的女孩</div>
+    <div class="memory-date">
+      <i class="far fa-calendar-alt mr-1"></i> October 03, 2026
+    </div>
+  </div>
+
+  <!-- ================= [文字编辑区] ================= -->
+  <!-- 可以在这里写下你们的故事、心路历程或想对她说的话，若留空则保持纯图展示 -->
+  <div class="memory-story-box text-center">
+    <!-- 例如在这里添加段落：
+    <p class="font-italic">“人这一生最幸运的，莫过于年少时惊艳了时光的人，在多年以后，依然是你身旁握紧双手的那个人。”</p>
+    -->
+  </div>
+  <!-- ============================================== -->
+
+  <!-- 7张电影胶卷水平长卷轴 (Filmstrip Reel - 左右平滑滚动，全画幅原画质展示，零空白死角) -->
+  <div class="film-reel-wrapper">
+    <button class="reel-nav-btn reel-prev" id="reelPrev" title="向左滚动">&#10094;</button>
+    <button class="reel-nav-btn reel-next" id="reelNext" title="向右滚动">&#10095;</button>
+
+    <div class="film-reel-track" id="reelTrack">
+
+      <!-- 胶卷 1 (Live) -->
+      <div class="film-strip-card" data-idx="0" data-has-live="true">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_1.jpg' | relative_url }}" alt="Memory Strip 1" class="strip-img" loading="lazy">
+          <video src="{{ '/assets/images/my_memory/strip_1.mp4' | relative_url }}" class="strip-video" playsinline muted loop preload="none"></video>
+          <div class="live-pill" title="悬浮播放实况"><span class="live-dot"></span>LIVE</div>
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 01</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 2 (Live) -->
+      <div class="film-strip-card" data-idx="1" data-has-live="true">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_2.jpg' | relative_url }}" alt="Memory Strip 2" class="strip-img" loading="lazy">
+          <video src="{{ '/assets/images/my_memory/strip_2.mp4' | relative_url }}" class="strip-video" playsinline muted loop preload="none"></video>
+          <div class="live-pill" title="悬浮播放实况"><span class="live-dot"></span>LIVE</div>
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 02</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 3 (Static) -->
+      <div class="film-strip-card" data-idx="2" data-has-live="false">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_3.jpg' | relative_url }}" alt="Memory Strip 3" class="strip-img" loading="lazy">
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 03</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 4 (Static) -->
+      <div class="film-strip-card" data-idx="3" data-has-live="false">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_4.jpg' | relative_url }}" alt="Memory Strip 4" class="strip-img" loading="lazy">
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 04</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 5 (Static) -->
+      <div class="film-strip-card" data-idx="4" data-has-live="false">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_5.jpg' | relative_url }}" alt="Memory Strip 5" class="strip-img" loading="lazy">
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 05</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 6 (Live) -->
+      <div class="film-strip-card" data-idx="5" data-has-live="true">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_6.jpg' | relative_url }}" alt="Memory Strip 6" class="strip-img" loading="lazy">
+          <video src="{{ '/assets/images/my_memory/strip_6.mp4' | relative_url }}" class="strip-video" playsinline muted loop preload="none"></video>
+          <div class="live-pill" title="悬浮播放实况"><span class="live-dot"></span>LIVE</div>
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 06</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+      <!-- 胶卷 7 (Live) -->
+      <div class="film-strip-card" data-idx="6" data-has-live="true">
+        <div class="strip-media-wrap">
+          <img src="{{ '/assets/images/my_memory/strip_7.jpg' | relative_url }}" alt="Memory Strip 7" class="strip-img" loading="lazy">
+          <video src="{{ '/assets/images/my_memory/strip_7.mp4' | relative_url }}" class="strip-video" playsinline muted loop preload="none"></video>
+          <div class="live-pill" title="悬浮播放实况"><span class="live-dot"></span>LIVE</div>
+        </div>
+        <div class="strip-card-foot">
+          <span>STRIP · 07</span>
+          <span>2026.10.03</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="reel-hint">
+    <span><i class="fas fa-arrows-alt-h mr-1"></i> 点击两侧箭头或左右滑动浏览胶卷 · 点击卡片放大查看细节</span>
+  </div>
+
+  <!-- 浪漫爱心分隔线 -->
+  <div class="memory-divider">
+    <div class="divider-line"></div>
+    <div class="divider-icon"><i class="fas fa-heart"></i></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- 第 8 张压轴单照展示 (Closing Highlight) -->
+  <div class="memory-final-container">
+    <div class="final-photo-card" data-idx="7" data-has-live="true">
+      <div class="final-media-wrap">
+        <img src="{{ '/assets/images/my_memory/final_photo.jpg' | relative_url }}" alt="Forever Memory" class="final-img" loading="lazy">
+        <video src="{{ '/assets/images/my_memory/final_photo.mp4' | relative_url }}" class="final-video" playsinline muted loop preload="none"></video>
+        <div class="live-pill" title="悬浮播放实况"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <div class="final-foot">
+        FOREVER & ALWAYS
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 全屏相册 Lightbox -->
+<div class="memory-lightbox" id="memLightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="关闭">&times;</button>
+  <button class="lightbox-btn lightbox-prev" id="lightboxPrev" aria-label="上一张">&#10094;</button>
+  <button class="lightbox-btn lightbox-next" id="lightboxNext" aria-label="下一张">&#10095;</button>
+
+  <div class="lightbox-content-box" id="lightboxContent">
+    <div class="lightbox-media-holder">
+      <img src="" class="lightbox-img" id="lightboxImg" alt="Detail">
+      <video src="" class="lightbox-video" id="lightboxVideo" playsinline muted loop></video>
+    </div>
+    <div class="lightbox-bottom-bar">
+      <span class="lightbox-counter" id="lightboxCounter">1 / 8</span>
+      <button class="lightbox-live-toggle" id="lightboxLiveBtn">
+        <i class="fas fa-play"></i> 播放实况
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var items = [
+      { img: "{{ '/assets/images/my_memory/strip_1.jpg' | relative_url }}", video: "{{ '/assets/images/my_memory/strip_1.mp4' | relative_url }}" },
+      { img: "{{ '/assets/images/my_memory/strip_2.jpg' | relative_url }}", video: "{{ '/assets/images/my_memory/strip_2.mp4' | relative_url }}" },
+      { img: "{{ '/assets/images/my_memory/strip_3.jpg' | relative_url }}", video: null },
+      { img: "{{ '/assets/images/my_memory/strip_4.jpg' | relative_url }}", video: null },
+      { img: "{{ '/assets/images/my_memory/strip_5.jpg' | relative_url }}", video: null },
+      { img: "{{ '/assets/images/my_memory/strip_6.jpg' | relative_url }}", video: "{{ '/assets/images/my_memory/strip_6.mp4' | relative_url }}" },
+      { img: "{{ '/assets/images/my_memory/strip_7.jpg' | relative_url }}", video: "{{ '/assets/images/my_memory/strip_7.mp4' | relative_url }}" },
+      { img: "{{ '/assets/images/my_memory/final_photo.jpg' | relative_url }}", video: "{{ '/assets/images/my_memory/final_photo.mp4' | relative_url }}" }
+    ];
+
+    // 1. 水平胶卷滑轨箭头翻页控制
+    var track = document.getElementById('reelTrack');
+    var reelPrev = document.getElementById('reelPrev');
+    var reelNext = document.getElementById('reelNext');
+
+    if (reelPrev && reelNext && track) {
+      reelPrev.addEventListener('click', function() {
+        track.scrollBy({ left: -320, behavior: 'smooth' });
+      });
+      reelNext.addEventListener('click', function() {
+        track.scrollBy({ left: 320, behavior: 'smooth' });
+      });
+    }
+
+    // 2. 卡片鼠标悬浮 / 触摸播放 Live 逻辑
+    var cards = document.querySelectorAll('.film-strip-card, .final-photo-card');
+    cards.forEach(function(card) {
+      var hasLive = card.getAttribute('data-has-live') === 'true';
+      var video = card.querySelector('video');
+
+      if (hasLive && video) {
+        // 桌面端鼠标移入移出
+        card.addEventListener('mouseenter', function() {
+          card.classList.add('playing');
+          video.currentTime = 0;
+          video.play().catch(function(){});
+        });
+        card.addEventListener('mouseleave', function() {
+          card.classList.remove('playing');
+          video.pause();
+        });
+
+        // Live 药丸按钮点击控制
+        var pill = card.querySelector('.live-pill');
+        if (pill) {
+          pill.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (card.classList.contains('playing')) {
+              card.classList.remove('playing');
+              video.pause();
+            } else {
+              card.classList.add('playing');
+              video.currentTime = 0;
+              video.play().catch(function(){});
+            }
+          });
+        }
+      }
+
+      // 点击卡片本身触发全屏 Lightbox
+      card.addEventListener('click', function(e) {
+        var idx = parseInt(card.getAttribute('data-idx'), 10);
+        openLightbox(idx);
+      });
+    });
+
+    // 3. 全屏相册 Lightbox 控制
+    var currentIdx = 0;
+    var lightbox = document.getElementById('memLightbox');
+    var lbImg = document.getElementById('lightboxImg');
+    var lbVideo = document.getElementById('lightboxVideo');
+    var lbCounter = document.getElementById('lightboxCounter');
+    var lbLiveBtn = document.getElementById('lightboxLiveBtn');
+
+    function renderLightbox() {
+      var cur = items[currentIdx];
+      lbImg.src = cur.img;
+      lbCounter.textContent = (currentIdx + 1) + ' / ' + items.length;
+
+      // 隐藏视频并重置状态
+      lbVideo.pause();
+      lbVideo.style.display = 'none';
+      lbImg.style.display = 'block';
+
+      if (cur.video) {
+        lbVideo.src = cur.video;
+        lbLiveBtn.style.display = 'inline-flex';
+        lbLiveBtn.innerHTML = '<i class="fas fa-play"></i> 播放实况';
+      } else {
+        lbVideo.src = '';
+        lbLiveBtn.style.display = 'none';
+      }
+    }
+
+    function openLightbox(idx) {
+      currentIdx = idx;
+      renderLightbox();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+      lbVideo.pause();
+    }
+
+    function prevItem() {
+      currentIdx = (currentIdx - 1 + items.length) % items.length;
+      renderLightbox();
+    }
+
+    function nextItem() {
+      currentIdx = (currentIdx + 1) % items.length;
+      renderLightbox();
+    }
+
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightboxPrev').addEventListener('click', function(e){ e.stopPropagation(); prevItem(); });
+    document.getElementById('lightboxNext').addEventListener('click', function(e){ e.stopPropagation(); nextItem(); });
+
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // 实况切换播放
+    lbLiveBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (lbVideo.style.display === 'block') {
+        lbVideo.pause();
+        lbVideo.style.display = 'none';
+        lbImg.style.display = 'block';
+        lbLiveBtn.innerHTML = '<i class="fas fa-play"></i> 播放实况';
+      } else {
+        lbImg.style.display = 'none';
+        lbVideo.style.display = 'block';
+        lbVideo.currentTime = 0;
+        lbVideo.play().catch(function(){});
+        lbLiveBtn.innerHTML = '<i class="fas fa-pause"></i> 暂停实况';
+      }
+    });
+
+    // 键盘方向键支持
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') prevItem();
+      if (e.key === 'ArrowRight') nextItem();
+    });
+  })();
+</script>
