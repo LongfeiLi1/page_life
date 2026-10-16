@@ -3,6 +3,7 @@
     if (!tocList) return;
 
     var content = document.querySelector('.blog-content');
+    if (!content) return;
     var headings = content.querySelectorAll('h1, h2, h3');
     var navbarHeight = 90;
 

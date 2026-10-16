@@ -115,8 +115,10 @@ drawBubble = function (svg, bubbleInfo) {
 var canvases = document.querySelectorAll(".bubble-visual-hash");
 canvases.forEach(function (canvas) {
     var hash = canvas.getAttribute("data-bubble-visual-hash");
+    if (!hash || !canvas.viewBox || !canvas.viewBox.baseVal) return;
     var width = canvas.viewBox.baseVal.width;
     var height = canvas.viewBox.baseVal.height;
+    if (!width || !height) return;
     var bubbleInfo = createBubbleInfo(createHashGroupForString(hash), 8, width, height);
     drawBubble(canvas, bubbleInfo);
 });

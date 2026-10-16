@@ -6,7 +6,11 @@ $(function () {
         effectTime: 300,
         placeholder: "",
         onError: function(element) {
-            console.log('[lazyload] Error loading ' + element.data('src'));
+            console.warn('[lazyload] Error loading ' + element.data('src'));
+            if (element.is('img')) {
+                element.attr('alt', 'Image failed to load');
+                element.css({'min-height': '0', 'background-image': 'none'});
+            }
         },
         afterLoad: function(element) {
             if (element.is('img')) {
