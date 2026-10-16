@@ -112,11 +112,19 @@ drawBubble = function (svg, bubbleInfo) {
     }
 }
 
-var canvases = document.querySelectorAll(".bubble-visual-hash");
-canvases.forEach(function (canvas) {
-    var hash = canvas.getAttribute("data-bubble-visual-hash");
-    var width = canvas.viewBox.baseVal.width;
-    var height = canvas.viewBox.baseVal.height;
-    var bubbleInfo = createBubbleInfo(createHashGroupForString(hash), 8, width, height);
-    drawBubble(canvas, bubbleInfo);
-});
+function initBubbleVisualHash() {
+    var canvases = document.querySelectorAll(".bubble-visual-hash");
+    canvases.forEach(function (canvas) {
+        var hash = canvas.getAttribute("data-bubble-visual-hash");
+        var width = canvas.viewBox.baseVal.width;
+        var height = canvas.viewBox.baseVal.height;
+        var bubbleInfo = createBubbleInfo(createHashGroupForString(hash), 8, width, height);
+        drawBubble(canvas, bubbleInfo);
+    });
+}
+
+initBubbleVisualHash();
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { md5, createHashGroupForString, createBubbleInfo, drawBubble, initBubbleVisualHash };
+}

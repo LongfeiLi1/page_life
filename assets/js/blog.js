@@ -1,14 +1,18 @@
-(function () {
-    var tocList = document.querySelector('.blog-toc-list');
-    if (!tocList) return;
+function buildToc(options) {
+    var doc = (options && options.document) || document;
+    var win = (options && options.window) || window;
 
-    var content = document.querySelector('.blog-content');
+    var tocList = doc.querySelector('.blog-toc-list');
+    if (!tocList) return null;
+
+    var content = doc.querySelector('.blog-content');
     var headings = content.querySelectorAll('h1, h2, h3');
     var navbarHeight = 90;
 
     if (headings.length === 0) {
-        document.getElementById('blog-toc').style.display = 'none';
-        return;
+        var tocEl = doc.getElementById('blog-toc');
+        if (tocEl) tocEl.style.display = 'none';
+        return { tocList: tocList, headings: headings, tocLinks: [] };
     }
 
     // Add scroll-margin to all headings so anchor links clear the navbar
@@ -18,16 +22,16 @@
         }
         heading.style.scrollMarginTop = navbarHeight + 'px';
 
-        var li = document.createElement('li');
-        var a = document.createElement('a');
+        var li = doc.createElement('li');
+        var a = doc.createElement('a');
         a.href = '#' + heading.id;
         a.textContent = heading.textContent;
         a.className = 'toc-' + heading.tagName.toLowerCase();
         a.addEventListener('click', function (e) {
             e.preventDefault();
-            var target = document.getElementById(heading.id);
+            var target = doc.getElementById(heading.id);
             if (target) {
-                window.scrollTo({
+                win.scrollTo({
                     top: target.offsetTop - navbarHeight,
                     behavior: 'smooth'
                 });
@@ -41,7 +45,7 @@
     // Highlight active heading on scroll
     var tocLinks = tocList.querySelectorAll('a');
     function updateActive() {
-        var scrollPos = window.scrollY + navbarHeight + 10;
+        var scrollPos = win.scrollY + navbarHeight + 10;
         var current = null;
         headings.forEach(function (heading) {
             if (heading.offsetTop <= scrollPos) {
@@ -52,6 +56,16 @@
             link.classList.toggle('toc-active', link.getAttribute('href') === '#' + current);
         });
     }
-    window.addEventListener('scroll', updateActive, { passive: true });
+    win.addEventListener('scroll', updateActive, { passive: true });
     updateActive();
+
+    return { tocList: tocList, headings: headings, tocLinks: tocLinks, updateActive: updateActive };
+}
+
+(function () {
+    buildToc();
 })();
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { buildToc: buildToc };
+}
